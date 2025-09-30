@@ -1,4 +1,3 @@
-BEGIN TRANSACTION
 CREATE TABLE IF NOT EXISTS "players" (
     "user_id" INTEGER PRIMARY KEY,
     "points" INTEGER DEFAULT 0,
@@ -9,4 +8,3 @@ CREATE TABLE IF NOT EXISTS "players" (
     "moveMediafiles" TEXT DEFAULT "None",
     "moveIsSended" INTEGER DEFAULT 0
 );
-COMMIT;

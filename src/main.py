@@ -1,48 +1,47 @@
-from config import bot, ID_CRM_OE
-
-#from oerChat.app.handlers import handlers as orcHandlers
+from config import bot, ID_CRM_OE, ID_CRM_OE_ADMIN
+from CRM_OE.database.scheme import createTable
 
 from CRM_OE.app.handlers import handlers as crmHandlers
-#from CRM_OE.app.callbacks import callbacks as crmCallbacks
 
 import asyncio
-import aiosqlite
 
-from aiogram import Dispatcher
+from aiogram import Dispatcher, Router, F
+from aiogram.types import Message
 
 
 dp = Dispatcher()
+globalRouter = Router()
+
+
+
+@globalRouter.message(F.text.lower() == "бот")
+async def textBotCheck(message: Message):
+    await message.answer("✅ На месте")
 
 
 
 async def start():
-    #dp.include_router(orcHandlers)
-
+    dp.include_router(globalRouter)
     dp.include_router(crmHandlers)
-    #dp.include_router(crmCallbacks)
 
-    print("✅")
+    await createTable()
+
+    print("(V) main.py: start(): успех.")
     await bot.send_message(
-        chat_id=ID_CRM_OE,
-        message_thread_id=54,
+        chat_id=ID_CRM_OE_ADMIN,
         text="<code>hola amigos por favor</code>"
     )
     
     await dp.start_polling(bot)
 
-async def shutdown():
-    print("💤")
-    await bot.send_message(
-        chat_id=ID_CRM_OE,
-        message_thread_id=54,
-        text="<code>Change the world. My final message. Goodbye.</code>"
-    )
-
-
 if __name__ == "__main__":
     try:
         asyncio.run(start())
     except KeyboardInterrupt:
-        asyncio.run(shutdown())
+        print("(V) main.py: shutdown(): успех.")
+        bot.send_message(
+            chat_id=ID_CRM_OE_ADMIN,
+            text="<code>Change the world. My final message. Goodbye.</code>"
+        )
     except Exception as e:
-        print(f"❗ {e}")
+        print(f"(XXX) main.py: {e}")

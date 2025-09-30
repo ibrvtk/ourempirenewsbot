@@ -1,18 +1,17 @@
-from config import DB_PLAYERS_PATH
+from config import DB_PLAYERS_PATH, logging
 
 import aiosqlite
-import os
 
 
 
 async def createTable():
     try:
         async with aiosqlite.connect(DB_PLAYERS_PATH) as db:
-            with open('scheme.sql', 'r', encoding='utf-8') as file:
+            with open('src/CRM_OE/database/scheme.sql', 'r', encoding='utf-8') as file:
                 sql_script = file.read()
             await db.executescript(sql_script)
             await db.commit()
-        print("(V) scheme.py: createTable(): успех.")
+        print("(V) scheme.py: createTable(): успех.") if logging else None
 
     except Exception as e:
         print(f"(XXX) scheme.py: createTable(): {e}.")
@@ -28,7 +27,7 @@ async def createUser(user_id: int, points: int = 0, adminLevel: int = 0,
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (user_id, points, adminLevel, country, eventsType, moveText, moveMediafiles, moveIsSended))
             await db.commit()
-            print("(V) scheme.py: createUser(): успех.")
+            print("(V) scheme.py: createUser(): успех.") if logging else None
             return cursor.lastrowid
 
     except Exception as e:
@@ -40,7 +39,7 @@ async def readUser(user_id: int):
         async with aiosqlite.connect(DB_PLAYERS_PATH) as db:
             async with db.execute("SELECT * FROM players WHERE user_id = ?", (user_id,)) as cursor:
                 user_data = await cursor.fetchone()
-                print("(V) scheme.py: readUser(): успех.")
+                print("(V) scheme.py: readUser(): успех.") if logging else None
                 return user_data
     except Exception as e:
         print(f"(XX) scheme.py: readUser(): {e}")
@@ -51,7 +50,7 @@ async def readUsers():
         async with aiosqlite.connect(DB_PLAYERS_PATH) as db:
             async with db.execute("SELECT * FROM players") as cursor:
                 users = await cursor.fetchall()
-                print("(V) scheme.py: readUsers(): успех.")
+                print("(V) scheme.py: readUsers(): успех.") if logging else None
                 return users
     except Exception as e:
         print(f"(XX) scheme.py: readUsers(): {e}")
@@ -67,7 +66,7 @@ async def updateUser(user_id: int, **kwargs):
             
             await db.execute(f"UPDATE players SET {setClause} WHERE user_id = ?", values)
             await db.commit()
-            print("(V) scheme.py: updateUser(): успех.")
+            print("(V) scheme.py: updateUser(): успех.") if logging else None
 
     except Exception as e:
         print(f"(XX) scheme.py: updateUser(): {e}")
@@ -78,7 +77,7 @@ async def deleteUser(user_id: int):
         async with aiosqlite.connect(DB_PLAYERS_PATH) as db:
             await db.execute("DELETE FROM players WHERE user_id = ?", (user_id,))
             await db.commit()
-            print("(V) scheme.py: deleteUser(): успех.")
+            print("(V) scheme.py: deleteUser(): успех.") if logging else None
 
     except Exception as e:
         print(f"(XX) scheme.py: deleteUser(): {e}")

@@ -7,11 +7,15 @@
 # Файл .env
 
 ```
-TOKEN=
-DB_PLAYERS_PATH=
+TOKEN=<token>
+DB_PLAYERS_PATH=src/CRM_OE/database/players.db
 
-ID_OERCHAT=-100
-ID_CRM_OE=-100
+
+ID_OERCHAT=-100<id>
+ID_OERCHAT_ADMIN=-100<id>
+
+ID_CRM_OE=-100<id>
+ID_CRM_OE_ADMIN=-100<id>
 ```
 
 # Коды чатов
@@ -23,7 +27,7 @@ ID_CRM_OE=-100
 
 * Гитхаб репозиторий "перекочевал" из `vkuskiy/oerChatBot` _(ныне удалено)_ на `ibrvtk/ourempirenewsbot`.
 * `Type checking` должен быть `off`, что бы избежать "критические" ошибки «Отсутствует проверка на None».
-* `(V)` - успешная операция, `(X)` - ошибка, `(XX)` - непредвиденная ошибка, `(XXX)` - критическая ошибка.
+* `(V)` - успешная операция, `(X)` - ошибка, `(XX)` - непредвиденная ошибка, `(XXX)` - критическая ошибка. Названия ошибок в этом файле не обязательно относятся к их **чисто** техническим последствиям.
 
 ## Написано с помощью ИИ
-* `src/CRM_OE/database/scheme.py`: `readUsers()`, `updateUser()` — [DeepSeek](https://www.deepseek.com)
+* `src/CRM_OE/database/scheme.py`: `readUsers()`, `updateUser()` — [**DeepSeek**](https://www.deepseek.com)
