@@ -1,4 +1,4 @@
-from config import bot, CRM_OE
+from config import bot, ID_CRM_OE
 
 #from oerChat.app.handlers import handlers as orcHandlers
 
@@ -6,13 +6,14 @@ from CRM_OE.app.handlers import handlers as crmHandlers
 #from CRM_OE.app.callbacks import callbacks as crmCallbacks
 
 import asyncio
+import aiosqlite
 
 from aiogram import Dispatcher
 
 
 dp = Dispatcher()
 
-        
+
 
 async def start():
     #dp.include_router(orcHandlers)
@@ -22,7 +23,7 @@ async def start():
 
     print("✅")
     await bot.send_message(
-        chat_id=CRM_OE,
+        chat_id=ID_CRM_OE,
         message_thread_id=54,
         text="<code>hola amigos por favor</code>"
     )
@@ -32,10 +33,11 @@ async def start():
 async def shutdown():
     print("💤")
     await bot.send_message(
-        chat_id=CRM_OE,
+        chat_id=ID_CRM_OE,
         message_thread_id=54,
         text="<code>Change the world. My final message. Goodbye.</code>"
     )
+
 
 if __name__ == "__main__":
     try:
