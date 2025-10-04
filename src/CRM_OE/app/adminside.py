@@ -21,6 +21,7 @@ async def cmdAdminpanel(message: Message):
     await message.reply("📝 <b>Изменить права</b> — изменить права конкретного человека <i>(сделать игроком, админом и любой другой параметр)</i>.\n\n"
                         "📜 <b>Список всех игроков</b> — список всех людей в БД ЦРМ.",
                         reply_markup=kb.adminpanelKeyboard)
+    
 
 class fsmAdminpanelEditRights(StatesGroup):
     text = State()

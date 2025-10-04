@@ -11,9 +11,9 @@ TOKEN = os.getenv('TOKEN')
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode='HTML'))
 
 # Логгирование в терминале
-loggingCommands = True # Все поступающие команды. 
-loggingCallbacks = True # Все поступающие колбэки.
-loggingsOther = True # Логгирование всего остального (F.text, функции и т. д.).
+# loggingCommands = True # Все поступающие команды. 
+# loggingCallbacks = True # Все поступающие колбэки.
+loggingOther = True # Логгирование всего остального (F.text, функции и т. д.).
 loggingErrors = True # Все ошибки. Критические (XXX) ошибки логируются даже если этот параметр False.
 
 
@@ -24,7 +24,7 @@ async def delayMsgDelete(message: Message, delay: int):
         await message.delete()
         placeholderText = f"{message.message_thread_id}: удалён оффтоп" if message.chat.id == ID_CRM_OE else "удалено сообщение по отложке"
         delayInMinutes = delay / 60
-        print(f"(V) @{message.chat.username if message.chat.username else message.chat.id}: {placeholderText} (прошло {delayInMinutes} минут).")
+        print(f"(V) @{message.chat.username if message.chat.username else message.chat.id}: {placeholderText} (прошло {delayInMinutes} минут).") if loggingOther else None
     except Exception as e:
         placeholderText = f"{message.message_thread_id}: оффтоп не был удалён:" if message.chat.id == ID_CRM_OE else "отложенное удаление сообщение не произошло:"
         print(f"(X) @{message.chat.username if message.chat.username else message.chat.id}: {placeholderText} {e}.") if loggingErrors else None
@@ -32,9 +32,14 @@ async def delayMsgDelete(message: Message, delay: int):
 
 
 SUPERADMIN = int(os.getenv('SUPERADMIN')) # Суперадмин, для первоначальной настройки бота.
-# Захаркоденый список суперадминов. Раскомментировать.
+# Захаркоденый список суперадминов. Раскомментировать и закомментировать строку 34.
 # SUPERADMIN = (-100, -100,)
-DB_PLAYERS_PATH = os.getenv('DB_PLAYERS_PATH')
+
+
+DB_ORC_USERS_PATH = os.getenv('DB_ORC_USERS_PATH')
+DB_ORC_APPEALS_PATH = os.getenv('DB_ORC_APPEALS_PATH')
+
+DB_CRM_PATH = os.getenv('DB_CRM_PLAYERS_PATH')
 
 
 # Команды, введимые в админ чате (*_ADMIN), выполняются без проверки человека на наличие роли админа (adminLevel) в БД (scheme.sql: players),

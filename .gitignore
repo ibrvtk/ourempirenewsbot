@@ -1,4 +1,9 @@
+src/oerChat/databases
+
 .venv
 .env
-src/CRM_OE/database/players.db
 *pycache*
+
+src/oerChat/databases/users.db
+src/oerChat/databases/appeals.db
+src/CRM_OE/database/players.db
