@@ -29,7 +29,7 @@ ID_CRM_OE_ADMIN=-100<id>
 
 # Коды чатов
 
-* `orc*` — oerChat
+* `oer*` — oerChat
 * `crm*` — CRM_OE
 
 # Дополнительная информация
@@ -37,10 +37,11 @@ ID_CRM_OE_ADMIN=-100<id>
 * Гитхаб репозиторий "перекочевал" из `vkuskiy/oerChatBot` _(ныне удалено)_ на `ibrvtk/ourempirenewsbot`.
 * `Type checking` должен быть `off`, что бы избежать "критические" ошибки «Отсутствует проверка на None».
 * `(V)` - успешная операция, `(X)` - ошибка, `(XX)` - непредвиденная ошибка, `(XXX)` - критическая ошибка. Названия ошибок в этом файле не обязательно относятся к их **чисто** техническим последствиям.
-* `/userside.py` - публичные команды, `/adminside.py` - команды только для админов.
-* В названиях функций: `cmd` - команда, `cb` - колбэк, `text` - `F.text`, `uni` - несколько вариантов.
+* `*/userside.py` - публичные команды, `*/adminside.py` - команды только для админов.
+* В названиях функций: `cmd` - команда, `cb` - колбэк, `text` - `F.text`, `uni` - смешанное.
 
 ## Написано с помощью ИИ
+
 * `CRM_OE/database/scheme.py`: `readUsers()`, `updateUser()` — [**DeepSeek**](https://www.deepseek.com)
-* `config.py`: `delayMsgDelete()` — [**DeepSeek**](https://www.deepseek.com)
 * `CRM_OE/app/adminside.py`: `fsmAdminpanelEditRightsText()` — [**DeepSeek**](https://www.deepseek.com)
+* `config.py`: `delayMsgDelete()` — [**DeepSeek**](https://www.deepseek.com)

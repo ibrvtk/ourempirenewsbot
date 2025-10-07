@@ -1,4 +1,4 @@
-import aiosqlite
+# import aiosqlite
 
 from aiogram.types import (
     ReplyKeyboardMarkup, KeyboardButton,
