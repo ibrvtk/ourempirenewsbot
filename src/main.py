@@ -1,10 +1,10 @@
-from config import bot, SUPERADMIN, ID_CRM_OE_ADMIN, ID_OERCHAT_ADMIN
+from config import bot, oerToggle, crmToggle, SUPERADMIN, ID_CRM_OE_ADMIN, ID_OERCHAT_ADMIN
 
 from oerChat.app.adminside import adminside as oerAdminsideHandlers
 
 from CRM_OE.app.userside import userside as crmUsersideHandlers
 from CRM_OE.app.adminside import adminside as crmAdminsideHandlers
-from CRM_OE.database.scheme import createTable, createUser
+import CRM_OE.database.scheme as crmDB
 
 from asyncio import run
 
@@ -25,11 +25,12 @@ globalRouter = Router()
 # Позже функционал будет перенесён (как минимум) в uniStart() .
 @globalRouter.message(F.user_id == SUPERADMIN, Command('db'))
 async def cmdDb(message: Message):
-    try:
-        await createUser(user_id=message.from_user.id)
-        await message.reply("✅ Успех")
-    except Exception as e:
-        print(f"(XXX) main.py: uniStart(): {e}.")
+    if crmToggle:
+        try:
+            await crmDB.createUser(user_id=message.from_user.id)
+            await message.reply("✅ Успех")
+        except Exception as e:
+            print(f"(XXX) main.py: uniStart(): {e}.")
 
 
 @globalRouter.message(F.user_id == SUPERADMIN, Command("start"))
@@ -49,21 +50,22 @@ async def cmdCancel(message: Message, state: FSMContext):
 async def main():
     dp.include_router(globalRouter)
 
-    dp.include_router(oerAdminsideHandlers)
+    dp.include_router(oerAdminsideHandlers) if oerToggle else None
 
-    dp.include_router(crmUsersideHandlers)
-    dp.include_router(crmAdminsideHandlers)
+    dp.include_router(crmUsersideHandlers)  if crmToggle else None
+    dp.include_router(crmAdminsideHandlers) if crmToggle else None
+    await crmDB.createTable()               if crmToggle else None
 
-    await createTable()
-
-    print("(V) main.py: start(): успех.")
-    ADMIN_CHATS = [ID_OERCHAT_ADMIN, ID_CRM_OE_ADMIN]
+    ADMIN_CHATS = []
+    if oerToggle: ADMIN_CHATS.append(ID_OERCHAT_ADMIN); print("(i) oer включен.")
+    if crmToggle: ADMIN_CHATS.append(ID_CRM_OE_ADMIN); print("(i) crm включен.")
     for chat in ADMIN_CHATS:
         await bot.send_message(
             chat_id=chat,
             text="<code>hola amigos por favor</code>"
         )
-    
+        
+    print("(V) main.py: start(): успех.")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

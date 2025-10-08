@@ -1,12 +1,13 @@
 from os import getenv
 from asyncio import sleep
-from dotenv import load_dotenv; load_dotenv() # Импортируем и сразу запускаем.
+from dotenv import load_dotenv
 
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.types import Message
 
 
+load_dotenv()
 TOKEN = getenv('TOKEN')
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode='HTML'))
 
@@ -15,6 +16,9 @@ bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode='HTML'))
 # logCallbacks = True # Все поступающие колбэки.
 logOther = True # Логгирование всего остального (F.text, функции и т. д.).
 logErrors = True # Все ошибки. Критические ошибки (XXX) логируются даже если этот параметр False.
+
+oerToggle = True
+crmToggle = False
 
 
 

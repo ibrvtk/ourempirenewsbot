@@ -1,4 +1,4 @@
-from config import ID_CRM_OE, ID_CRM_OE_ADMIN, delayMsgDelete, logOther
+from config import logOther, ID_CRM_OE, ID_CRM_OE_ADMIN, delayMsgDelete
 from CRM_OE.database.scheme import readUser
 
 from asyncio import create_task
@@ -32,6 +32,6 @@ async def uniWho(message: Message):
     targetCountry = await readUser(target_id)
     if targetCountry  and targetCountry[3] != "None":
         await message.reply(f"Это <b>{targetCountry[3]}</b>.")
-        
+
     else:
         await message.reply("👻 <b>Это не игрок.</b>")

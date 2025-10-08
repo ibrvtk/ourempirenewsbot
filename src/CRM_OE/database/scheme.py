@@ -1,4 +1,4 @@
-from config import DB_CRM_PATH, logErrors
+from config import logErrors, DB_CRM_PATH
 
 from aiosqlite import connect
 

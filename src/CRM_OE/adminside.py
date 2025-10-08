@@ -1,7 +1,6 @@
-from config import bot, ID_CRM_OE_ADMIN, logErrors
-from CRM_OE.database.scheme import updateUser
-
+from config import bot, logErrors, ID_CRM_OE_ADMIN
 import CRM_OE.app.keyboards as kb
+from CRM_OE.database.scheme import updateUser
 
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
