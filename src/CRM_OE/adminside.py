@@ -1,5 +1,5 @@
 from config import bot, logErrors, ID_CRM_OE_ADMIN
-import CRM_OE.app.keyboards as kb
+import CRM_OE.keyboards as kb
 from CRM_OE.database.scheme import updateUser
 
 from aiogram import F, Router

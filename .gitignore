@@ -1,7 +1,6 @@
-src/oerChat/databases
+src/oerChat/databases/users.py
 
-.venv
-.env
+.*
 *pycache*
 
 src/oerChat/databases/users.db

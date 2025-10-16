@@ -1,12 +1,15 @@
-from config import bot, oerToggle, crmToggle, SUPERADMIN, ID_CRM_OE_ADMIN, ID_OERCHAT_ADMIN
+from config import bot, oerToggle, crmToggle, SUPERADMIN, ID_OERCHAT_ADMIN, ID_OERCHAT_ADMIN_APPEALS_THREAD, ID_CRM_OE_ADMIN
 
-from oerChat.app.adminside import adminside as oerAdminsideHandlers
+from oerChat.adminside import adminside as oerAdminsideHandlers
+from oerChat.adminside import conversationData as oerConversationData
+import oerChat.databases.scheme as oerDB
+from oerChat.databases.scheduler import schedulerAppealsTimeout
 
-from CRM_OE.app.userside import userside as crmUsersideHandlers
-from CRM_OE.app.adminside import adminside as crmAdminsideHandlers
+from CRM_OE.userside import userside as crmUsersideHandlers
+from CRM_OE.adminside import adminside as crmAdminsideHandlers
 import CRM_OE.database.scheme as crmDB
 
-from asyncio import run
+from asyncio import create_task, run
 
 from aiogram import Dispatcher, Router, F
 from aiogram.types import Message, ReplyKeyboardRemove
@@ -24,7 +27,7 @@ globalRouter = Router()
 # Доступна только Суперадмину, что бы не записывать случайных пользователей.
 # Позже функционал будет перенесён (как минимум) в uniStart() .
 @globalRouter.message(F.user_id == SUPERADMIN, Command('db'))
-async def cmdDb(message: Message):
+async def cmdDb(message: Message) -> None:
     if crmToggle:
         try:
             await crmDB.createUser(user_id=message.from_user.id)
@@ -35,22 +38,28 @@ async def cmdDb(message: Message):
 
 @globalRouter.message(F.user_id == SUPERADMIN, Command("start"))
 @globalRouter.message(F.user_id == SUPERADMIN, F.text.lower() == "бот")
-async def uniStart(message: Message):
+async def uniStart(message: Message) -> None:
     await message.answer("✅ На месте")
 
 
 @globalRouter.message(Command("cancel"))
-async def cmdCancel(message: Message, state: FSMContext):
-    await state.clear()
+async def cmdCancel(message: Message, state: FSMContext) -> None:
+    try:
+        await state.clear()
+        del oerConversationData[message.from_user.id]
+    except Exception: pass # Временное решение.
+
     await message.answer("✅ <b>Текущая операция отменена.</b>",
                              reply_markup=ReplyKeyboardRemove())
 
 
 
-async def main():
+async def main() -> None:
     dp.include_router(globalRouter)
 
     dp.include_router(oerAdminsideHandlers) if oerToggle else None
+    await oerDB.createTable()               if oerToggle else None
+    create_task(schedulerAppealsTimeout())  if oerToggle else None
 
     dp.include_router(crmUsersideHandlers)  if crmToggle else None
     dp.include_router(crmAdminsideHandlers) if crmToggle else None
@@ -62,14 +71,15 @@ async def main():
     for chat in ADMIN_CHATS:
         await bot.send_message(
             chat_id=chat,
+            message_thread_id=ID_OERCHAT_ADMIN_APPEALS_THREAD if chat == ID_OERCHAT_ADMIN else None,
             text="<code>hola amigos por favor</code>"
         )
         
-    print("(V) main.py: start(): успех.")
+    print("(V) main.py: Бот успешно запустился.")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
     try:
         run(main())
     except Exception as e:
-        print(f"(XXX) main.py: Ошибка при запуске проекта: {e}")
+        print(f"(XX) main.py: Ошибка при запуске: {e}.")
