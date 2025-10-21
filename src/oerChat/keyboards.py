@@ -1,7 +1,7 @@
 # import aiosqlite
 
 from aiogram.types import (
-    ReplyKeyboardMarkup, KeyboardButton,
+    # ReplyKeyboardMarkup, KeyboardButton,
     InlineKeyboardMarkup, InlineKeyboardButton
 )
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
@@ -22,7 +22,7 @@ def unbanKeyboardAcceptedActions_(appeal_id: str):
     
     keyboard.add(InlineKeyboardButton(text="✅ Разбан", callback_data=f"unbanAppealAcceptUnban_{appeal_id}"))
     keyboard.add(InlineKeyboardButton(text="❌ Отказ", callback_data=f"unbanAppealDeclineUnban_{appeal_id}"))
-    keyboard.add(InlineKeyboardButton(text="◀️", callback_data=f"unbanAppealHistoryPrev_{appeal_id}"))
-    keyboard.add(InlineKeyboardButton(text="▶️", callback_data=f"unbanAppealHistoryNext_{appeal_id}"))
+    keyboard.add(InlineKeyboardButton(text="◀️", callback_data=f"unbanAppealMsgHistoryPrev_{appeal_id}"))
+    keyboard.add(InlineKeyboardButton(text="▶️", callback_data=f"unbanAppealMsgHistoryNext_{appeal_id}"))
     
     return keyboard.adjust(2).as_markup()

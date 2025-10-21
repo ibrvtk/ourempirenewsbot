@@ -1,50 +1,58 @@
-# Сторонние библиотеки _(.venv)_
+# Телеграм-бот для ру сообщества Our Empire
 
-* aiogram 3.22.0
-* aiosqlite 0.21.0
-* python-dotenv 1.1.1
+## Функционал
 
-# Файл .env
+### [@oerChat](https://t.me/oerChat)
 
-```
-TOKEN=<token>
-SUPERADMIN=<id>
+* Подача апелляций забанеными в [сетке](https://blog.ourempire.ru/chats) и их рассмотрение модерацией.
 
+### [@CRM_OE](https://t.me/CRM_OE)
 
-DB_OER_USERS_PATH=src/oerChat/databases/users.db
-DB_OER_APPEALS_PATH=src/oerChat/databases/appeals.db
+* Удаление //оффтопа.
+* Добавление игроков в соответствующую БД _(W.I.P.)_. Команда `/who` для идентефикации.
 
-DB_CRM_PLAYERS_PATH=src/CRM_OE/database/players.db
+## Дополнительная информация
 
-
-ID_OERCHAT=-100<id>
-ID_OERCHAT_ADMIN=-100<id>
-ID_OERCHAT_ADMIN_APPEALS_THREAD=<message_thread_id>
-
-ID_CRM_OE=-100<id>
-ID_CRM_OE_ADMIN=-100<id>
-```
-
-# Коды чатов
-
-* `oer*` — oerChat
-* `crm*` — CRM_OE
-
-# Дополнительная информация
-
-* Python 3.12.3
+* [Python 3.12.3](https://www.python.org/downloads/release/python-3123)
+* W.I.P. 0.3.4
 * Гитхаб репозиторий "перекочевал" из `vkuskiy/oerChatBot` _(Нишка)_ _(ныне удалено)_ на `ibrvtk/ourempirenewsbot`.
 * `Type checking` должен быть `off`, что бы избежать "критические" ошибки «Отсутствует проверка на None».
-* `(i)` - информационное уведомление, `(+)` - создан новый процесс.
-* `(V)` - успешная операция, `(X)` - ошибка, `(XX)` - непредвиденная ошибка.
+* Типы уведомлений в терминале:
+  * `(i)` - информационное уведомление, `(+)` - создан новый процесс;
+  * `(V)` - успешная операция, `(X)` - ошибка, `(XX)` - непредвиденная ошибка.
 * `*/userside.py` - публичные команды, `*/adminside.py` - команды только для админов.
 * В названиях функций: `cmd` - команда, `cb` - коллбэк, `text` - `F.text`, `uni` - смешанное.
+  * Eсли "уникод фукнции" стоит в конце _(например `unbanCmd()`)_ - команда вызывает цепочку действий. Иначе _(например `cmdCancel()`)_ на один раз.
 
-## Написано с помощью ИИ
+### Коды чатов
 
-* `oerChat/adminside.py`: `cmdUnban()`: `if appellant_data and appellant_data[2] > datetime.now().timestamp():` — [**DeepSeek**](https://www.deepseek.com)
-* `oerChat/databases/appeals.py`: `getTimeouts()` — [**DeepSeek**](https://www.deepseek.com)
-* `oerChat/databases/scheduler.py` — [**DeepSeek**](https://www.deepseek.com)
-* `CRM_OE/database/scheme.py`: `readUsers()`, `updateUser()` — [**DeepSeek**](https://www.deepseek.com)
-* `CRM_OE/adminside.py`: `fsmAdminpanelEditRightsText()` — [**DeepSeek**](https://www.deepseek.com)
-* `config.py`: `delayMsgDelete()` — [**DeepSeek**](https://www.deepseek.com)
+* `oer*` — [@oerChat](https://t.me/oerChat)
+* `crm*` — [@CRM_OE](https://t.me/CRM_OE)
+
+### Написано с помощью ИИ
+
+* [`oerChat/databases/appeals.py`](src/oerChat/databases/appeals.py): `getTimeouts()` — [**DeepSeek**](https://www.deepseek.com)
+* [`oerChat/databases/scheduler.py`](src/oerChat/databases/scheduler.py) — [**DeepSeek**](https://www.deepseek.com)
+* [`CRM_OE/database/scheme.py`](src/CRM_OE/database/scheme.py): `readUsers()`, `updateUser()` — [**DeepSeek**](https://www.deepseek.com)
+
+## Файл .env
+
+```
+TOKEN=<token>                              # Токен бота.
+SUPERADMIN=<*user.id>                      # Суперадмин обладает сверхправами и может управлять ботом, даже будучи не записаным в какую-либо БД.
+SUPERADMIN_ARRAY=<*user.id>,<*user.id>,... # Список суперадминов (если понадобится несколько).
+
+
+DB_OER_USERS_PATH=src/oerChat/databases/users.db     # Пусть к oer-БД с данными об активных пользователях.
+DB_OER_APPEALS_PATH=src/oerChat/databases/appeals.db # Пусть к oer-БД с данными об апелляциях и таймаутах.
+
+DB_CRM_PLAYERS_PATH=src/CRM_OE/database/players.db # Пусть к oer-БД с данными об игроках.
+
+
+ID_OERCHAT=-100<chat_id>
+ID_OERCHAT_ADMIN=-100<chat_id>
+ID_OERCHAT_ADMIN_APPEALS_THREAD=<message_thread_id>
+
+ID_CRM_OE=-100<chat_id>
+ID_CRM_OE_ADMIN=-100<chat_id>
+```

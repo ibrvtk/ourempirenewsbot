@@ -1,4 +1,4 @@
-from config import bot, logErrors, ID_CRM_OE_ADMIN
+from config import bot, logError, ID_CRM_OE_ADMIN
 import CRM_OE.keyboards as kb
 from CRM_OE.database.scheme import updateUser
 
@@ -53,4 +53,4 @@ async def fsmAdminpanelEditRightsText(message: Message, state: FSMContext):
     
     except (ValueError, IndexError) as e:
         await message.reply(f"❌ <b>Ошибка!</b> Использование: user_id, поле=значение, поле2=значение2 и так далее.\n{fsmPlaceholderTextRetry}")
-        print(f"(X) CRM_OE/app/adminside.py: fsmAdminpanelEditRightsText(): {e}.") if logErrors else None
+        print(f"(X) CRM_OE/app/adminside.py: fsmAdminpanelEditRightsText(): {e}.") if logError else None

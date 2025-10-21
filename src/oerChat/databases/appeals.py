@@ -1,4 +1,4 @@
-from config import logOther, logErrors, DB_OER_APPEALS_PATH
+from config import logOther, logError, DB_OER_APPEALS_PATH
 
 from aiosqlite import connect, Row
 from datetime import datetime

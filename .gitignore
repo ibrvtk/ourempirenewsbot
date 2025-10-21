@@ -1,8 +1,7 @@
 src/oerChat/databases/users.py
+src/oerChat/publisherside.py
+planlist.txt
 
 .*
+*.db
 *pycache*
-
-src/oerChat/databases/users.db
-src/oerChat/databases/appeals.db
-src/CRM_OE/database/players.db
