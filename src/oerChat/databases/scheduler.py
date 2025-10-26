@@ -1,4 +1,4 @@
-from config import bot
+from config import BOT
 from oerChat.databases.appeals import updateUser, getTimeouts
 
 from asyncio import sleep
@@ -15,7 +15,7 @@ async def schedulerAppealsTimeout():
                 await updateUser(appellant_id, timeout=0)
                 
                 # Уведомляем пользователя
-                await bot.send_message(
+                await BOT.send_message(
                     chat_id=appellant_id,
                     text="📳 <b>Таймаут окончен!</b>"
                 )

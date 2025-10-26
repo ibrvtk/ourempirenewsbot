@@ -1,4 +1,4 @@
-from config import logOther, logError, DB_OER_APPEALS_PATH
+from config import LOG_OTHERS, LOG_ERRORS, DB_OER_APPEALS_PATH
 
 from aiosqlite import connect, Row
 from datetime import datetime
@@ -9,12 +9,18 @@ async def createUser(appellant_id: int, appeal_ids: str = "None", timeout: int =
     try:
         async with connect(DB_OER_APPEALS_PATH) as db:
             cursor = await db.execute("""
-                INSERT INTO appeals (appellant_id, appeal_ids, timeout)
+                INSERT OR IGNORE INTO appeals (appellant_id, appeal_ids, timeout)
                 VALUES (?, ?, ?)
             """, (appellant_id, appeal_ids, timeout))
             await db.commit()
-            print("(V) oerChat/databases/appeals.py: createUser(): успех.") if logOther else None
-            return cursor.lastrowid
+            changes = cursor.rowcount
+        
+            if changes > 0:
+                print("(V) oerChat/databases/appeals.py: createUser(): Успех.") if LOG_OTHERS else None
+                return cursor.lastrowid
+            else:
+                print(f"(i) oerChat/databases/appeals.py: createUser(): @{appellant_id} уже существует.") if LOG_ERRORS or LOG_OTHERS else None
+                return None
 
     except Exception as e:
         print(f"(XX) oerChat/databases/appeals.py: createUser(): {e}.")
@@ -25,7 +31,7 @@ async def readUser(appellant_id: int):
         async with connect(DB_OER_APPEALS_PATH) as db:
             async with db.execute("SELECT * FROM appeals WHERE appellant_id = ?", (appellant_id,)) as cursor:
                 user_data = await cursor.fetchone()
-                print("(V) oerChat/databases/appeals.py: readUser(): успех.") if logOther else None
+                print("(V) oerChat/databases/appeals.py: readUser(): Успех.") if LOG_OTHERS else None
                 return user_data
             
     except Exception as e:
@@ -42,7 +48,7 @@ async def updateUser(appellant_id: int, **kwargs) -> None:
             
             await db.execute(f"UPDATE appeals SET {setClause} WHERE appellant_id = ?", values)
             await db.commit()
-            print("(V) oerChat/databases/appeals.py: updateUser(): успех.") if logOther else None
+            print("(V) oerChat/databases/appeals.py: updateUser(): Успех.") if LOG_OTHERS else None
 
     except Exception as e:
         print(f"(XX) oerChat/databases/appeals.py: updateUser(): {e}.")
@@ -53,7 +59,7 @@ async def deleteUser(appellant_id: int) -> None:
         async with connect(DB_OER_APPEALS_PATH) as db:
             await db.execute("DELETE FROM appeals WHERE appellant_id = ?", (appellant_id,))
             await db.commit()
-            print("(V) oerChat/databases/appeals.py: deleteUser(): успех.") if logOther else None
+            print("(V) oerChat/databases/appeals.py: deleteUser(): Успех.") if LOG_OTHERS else None
 
     except Exception as e:
         print(f"(XX) oerChat/databases/appeals.py: deleteUser(): {e}.")

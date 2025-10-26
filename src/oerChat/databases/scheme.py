@@ -1,4 +1,4 @@
-from config import logOther, DB_OER_APPEALS_PATH#, DB_OER_USERS_PATH
+from config import LOG_OTHERS, DB_OER_APPEALS_PATH#, DB_OER_USERS_PATH
 
 from aiosqlite import connect
 
@@ -24,7 +24,7 @@ async def createTableAppeals() -> None:
                 sql_script = file.read()
             await db.executescript(sql_script)
             await db.commit()
-        print("(V) oerChat/databases/scheme.py: createTableAppeals(): успех.") if logOther else None
+        print("(V) oerChat/databases/scheme.py: createTableAppeals(): успех.") if LOG_OTHERS else None
 
     except Exception as e:
         print(f"(XXX) oerChat/databases/scheme.py: createTableAppeals(): {e}.")

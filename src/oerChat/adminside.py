@@ -1,5 +1,5 @@
 from config import (
-    bot, logError,
+    BOT, LOG_ERRORS,
     ID_OERCHAT_ADMIN, ID_OERCHAT_ADMIN_APPEALS_THREAD,
     PREFIX, SUPERADMIN
 )
@@ -27,7 +27,7 @@ messagesData = {}
 
 
 
-# /unban :
+'''V /unban V'''
 # appellant — подающий апелляцию, admin — принимающий.
 class FSMunban(StatesGroup):
     text = State() # Сообщение апеллянта. Значение сливается в `messageData[appellant_id][f'message_{messageCount}']`, а после обнуляется.
@@ -97,7 +97,7 @@ async def unbanNoMessageTimeout(appellant_id: int, state: FSMContext) -> None: #
     appellant_user = appealData[appellant_id].appellant_user
 
     try:
-        await bot.edit_message_text(
+        await BOT.edit_message_text(
             chat_id=ID_OERCHAT_ADMIN,
             message_id=appealData[appellant_id].toAdmin_message_id,
             text=f"🆘 <b>Истёкшая апелляция</b> — {appellant_user}\n"
@@ -106,13 +106,13 @@ async def unbanNoMessageTimeout(appellant_id: int, state: FSMContext) -> None: #
                 reply_markup=None
         )
 
-        await bot.send_message(
+        await BOT.send_message(
             chat_id=appellant_id,
             text=("⏰ <b>Ваша жалоба была автоматически закрыта.</b> Прошли сутки, а она не продвинулась.")
         )
 
     except TelegramBadRequest as e:
-        print(f"(X) oerChat/adminside.py: unbanNoMessageTimeout(): TelegramBadRequest: {e}.") if logError else None
+        print(f"(X) oerChat/adminside.py: unbanNoMessageTimeout(): TelegramBadRequest: {e}.") if LOG_ERRORS else None
     except Exception as e:
         print(f"(XX) oerChat/adminside.py: unbanNoMessageTimeout(): {e}.")
 
@@ -203,7 +203,7 @@ async def unbanAppellantMessage(message: Message, state: FSMContext) -> None: # 
         case 1:
             messagesData[appellant_id][message_N] = message.text
 
-            toAdmin_message = await bot.send_message(
+            toAdmin_message = await BOT.send_message(
                 chat_id=ID_OERCHAT_ADMIN,
                 message_thread_id=ID_OERCHAT_ADMIN_APPEALS_THREAD,
                 text=f"🆘 <b>Новая апелляция</b> — {appellant_user}\n"
@@ -220,7 +220,7 @@ async def unbanAppellantMessage(message: Message, state: FSMContext) -> None: # 
         case _:
             messagesData[appellant_id][message_N] = message.text
 
-            await bot.edit_message_text(
+            await BOT.edit_message_text(
                 chat_id=ID_OERCHAT_ADMIN,
                 message_id=appealData[appellant_id].toAdmin_message_id,
                 text=f"🆘 <b>Апелляция</b> — {appellant_user}\n"
@@ -229,7 +229,7 @@ async def unbanAppellantMessage(message: Message, state: FSMContext) -> None: # 
                     reply_markup=unbanKeyboardAcceptedActions_(appeal_id)
             )
 
-            await bot.set_message_reaction(
+            await BOT.set_message_reaction(
                 chat_id=appellant_id,
                 message_id=message.message_id,
                 reaction=[{"type": "emoji", "emoji": "👍"}]
@@ -270,7 +270,7 @@ async def unbanCbAppealAccept(callback: CallbackQuery, state: FSMContext) -> Non
                                          f"<i>Принят {admin_user}</i>",
                                         reply_markup=unbanKeyboardAcceptedActions_(appeal_id))
         
-        await bot.send_message(
+        await BOT.send_message(
             chat_id=appellant_id,
             text="✅ <b>Апелляция была принята!</b> У Вас начался диалог с администратором <i>(через бота. Пишите прямо сюда)</i>."
         )
@@ -279,7 +279,7 @@ async def unbanCbAppealAccept(callback: CallbackQuery, state: FSMContext) -> Non
         await callback.answer("❓ Апелляция не найдена")
         await callback.message.reply("❌ <b>Ошибка.</b> Возможно этот человек удалил переписку с ботом. Во всяком случае, бот не может установить с ним связь. Апелляция была закрыта.")
         await callback.message.edit_reply_markup(reply_markup=None)
-        print(f"(X) oerChat/adminside.py: unbanCbAppealAccept(): TelegramBadRequest: {e}.") if logError else None
+        print(f"(X) oerChat/adminside.py: unbanCbAppealAccept(): TelegramBadRequest: {e}.") if LOG_ERRORS else None
         await unbanAppealIdWriteInDB(appellant_id, state)
         return
     except Exception as e:
@@ -320,7 +320,7 @@ async def unbanCbAppealDecline(callback: CallbackQuery, state: FSMContext) -> No
     appealData[appellant_id].admin_user = admin_user
 
     try:
-        await bot.edit_message_text(
+        await BOT.edit_message_text(
             chat_id=ID_OERCHAT_ADMIN,
             message_id=appealData[appellant_id].toAdmin_message_id,
             text=f"🆘 <b>Закрытая апелляция</b> — {appellant_user}\n"
@@ -329,13 +329,13 @@ async def unbanCbAppealDecline(callback: CallbackQuery, state: FSMContext) -> No
                 reply_markup=None
         )
 
-        await bot.send_message(
+        await BOT.send_message(
             chat_id=appellant_id,
             text="🗑 <b>Вашу апелляцию отклонили.</b>"
         )
 
     except TelegramBadRequest as e:
-        print(f"(X) oerChat/adminside.py: unbanCbAppealDecline(): TelegramBadRequest: {e}.") if logError else None
+        print(f"(X) oerChat/adminside.py: unbanCbAppealDecline(): TelegramBadRequest: {e}.") if LOG_ERRORS else None
     except Exception as e:
         print(f"(XX) oerChat/adminside.py: unbanCbAppealDecline(): {e}.")
 
@@ -407,7 +407,7 @@ async def unbanFSMtime(message: Message, state: FSMContext) -> None:
         await updateUser(appellant_id, timeout=timeout)
 
         try:
-            await bot.edit_message_text(
+            await BOT.edit_message_text(
                 chat_id=ID_OERCHAT_ADMIN,
                 message_id=appealData[appellant_id].toAdmin_message_id,
                 text=f"🆘 <b>Закрытая апелляция</b> — {appellant_user}\n"
@@ -416,20 +416,20 @@ async def unbanFSMtime(message: Message, state: FSMContext) -> None:
                     reply_markup=None
             )
 
-            await bot.send_message(
+            await BOT.send_message(
                 chat_id=appellant_id,
                 text=f"📵 <b>Вам выдали таймаут на {time_display}.</b>"
             )
 
         except TelegramBadRequest as e:
-            print(f"(X) oerChat/adminside.py: unbanFSMtime(): TelegramBadRequest: {e}.") if logError else None
+            print(f"(X) oerChat/adminside.py: unbanFSMtime(): TelegramBadRequest: {e}.") if LOG_ERRORS else None
             return
         
         await unbanAppealIdWriteInDB(appellant_id, state)
 
     except ValueError:
         await message.reply("❌ <b>Ошибка!</b> Нужно отправить секунды числом. Попробуйте снова.")
-        print(f"(X) oerChat/adminside.py: unbanFSMtime(): ValueError: {e}.") if logError else None
+        print(f"(X) oerChat/adminside.py: unbanFSMtime(): ValueError: {e}.") if LOG_ERRORS else None
         return
     except Exception as e:
         await message.reply("❌ <b>Непредвиденная ошибка!</b> Для конкретики нужно посмотреть логи. Попробуйте снова.")
@@ -466,7 +466,7 @@ async def unbanCbAppealAcceptUnban(callback: CallbackQuery, state: FSMContext) -
         return
 
     try:
-        await bot.edit_message_text(
+        await BOT.edit_message_text(
             chat_id=ID_OERCHAT_ADMIN,
             message_id=appealData[appellant_id].toAdmin_message_id,
             text=f"🆘 <b>Решённая апелляция</b> — {appellant_user}\n"
@@ -475,11 +475,11 @@ async def unbanCbAppealAcceptUnban(callback: CallbackQuery, state: FSMContext) -
                 reply_markup=None
         )
 
-        await bot.send_message(
+        await BOT.send_message(
             chat_id=appellant_id,
             text="🎉 <b>Вы были разбанены!</b> Добро пожаловать. Снова."
         )
-        await bot.send_message(
+        await BOT.send_message(
             chat_id=appellant_id,
             text="Если во время попытки зайти в какой-либо чат <a href='https://blog.ourempire.ru/chats'>сетки</a> Вам пишет что Вы забанены — это техническая ошибка. Напишите в ЛС @vkuskiy."
         )
@@ -488,7 +488,7 @@ async def unbanCbAppealAcceptUnban(callback: CallbackQuery, state: FSMContext) -
         await callback.answer("❓ Апелляция не найдена")
         await callback.message.reply("❌ <b>Ошибка.</b> Возможно этот человек удалил переписку с ботом. Во всяком случае, бот не может установить с ним связь. Апелляция была закрыта.")
         await callback.message.edit_reply_markup(reply_markup=None)
-        print(f"(X) oerChat/adminside.py: unbanCbAppealAcceptUnban(): TelegramBadRequest: {e}.") if logError else None
+        print(f"(X) oerChat/adminside.py: unbanCbAppealAcceptUnban(): TelegramBadRequest: {e}.") if LOG_ERRORS else None
     except Exception as e:
         await callback.answer("❓ Апелляция не найдена")
         await callback.message.reply("❌ <b>Непрдевиденная ошибка</b> при попытке связаться с этим человеком. Для конкретики нужно посмотреть логи. Апелляция была закрыта.")
@@ -526,7 +526,7 @@ async def unbanCbAppealDeclineUnban(callback: CallbackQuery, state: FSMContext) 
         return
 
     try:
-        await bot.edit_message_text(
+        await BOT.edit_message_text(
             chat_id=ID_OERCHAT_ADMIN,
             message_id=appealData[appellant_id].toAdmin_message_id,
             text=f"🆘 <b>Решённая апелляция</b> — {appellant_user}\n"
@@ -535,7 +535,7 @@ async def unbanCbAppealDeclineUnban(callback: CallbackQuery, state: FSMContext) 
                 reply_markup=None
         )
 
-        await bot.send_message(
+        await BOT.send_message(
             chat_id=appellant_id,
             text="❌ <b>Вам отказали в разбане.</b>"
         )
@@ -544,7 +544,7 @@ async def unbanCbAppealDeclineUnban(callback: CallbackQuery, state: FSMContext) 
         await callback.answer("❓ Апелляция не найдена")
         await callback.message.reply("❌ <b>Ошибка.</b> Возможно этот человек удалил переписку с ботом. Во всяком случае, бот не может установить с ним связь. Апелляция была закрыта.")
         await callback.message.edit_reply_markup(reply_markup=None)
-        print(f"(X) oerChat/adminside.py: unbanCbAppealDeclineUnban(): TelegramBadRequest: {e}.") if logError else None
+        print(f"(X) oerChat/adminside.py: unbanCbAppealDeclineUnban(): TelegramBadRequest: {e}.") if LOG_ERRORS else None
     except Exception as e:
         await callback.answer("❓ Апелляция не найдена")
         await callback.message.reply("❌ <b>Непрдевиденная ошибка</b> при попытке связаться с этим человеком. Для конкретики нужно посмотреть логи. Апелляция была закрыта.")
@@ -590,7 +590,7 @@ async def unbanCbAppealMsgHistoryPrev(callback: CallbackQuery) -> None:
         await callback.answer("❌ Это первое сообщение")
         return
     
-    await bot.edit_message_text(
+    await BOT.edit_message_text(
         chat_id=ID_OERCHAT_ADMIN,
         message_id=appealData[appellant_id].toAdmin_message_id,
         text=f"🆘 <b>Апелляция</b> — {appellant_user}\n"
@@ -635,7 +635,7 @@ async def unbanCbAppealMsgHistoryNext(callback: CallbackQuery) -> None:
         await callback.answer("❌ Это последнее сообщение")
         return
     
-    await bot.edit_message_text(
+    await BOT.edit_message_text(
         chat_id=ID_OERCHAT_ADMIN,
         message_id=appealData[appellant_id].toAdmin_message_id,
         text=f"🆘 <b>Апелляция</b> — {appellant_user}\n"
@@ -661,14 +661,14 @@ async def unbanAdminMessage(message: Message) -> None:
         return
 
     try:
-        await bot.send_message(
+        await BOT.send_message(
             chat_id=appellant_id,
             text=(f"🆘 <b>Сообщение от модерации</b>\n"
                     f"<blockquote>{message.text}</blockquote>")
         )
 
     except Exception as e:
-        print(f"(XX) oerChat/adminside.py: unbanAdminMessage(): {e}.") if logError else None
+        print(f"(XX) oerChat/adminside.py: unbanAdminMessage(): {e}.") if LOG_ERRORS else None
         return
     
 
@@ -705,3 +705,4 @@ async def unbanClearAllDataCancel(callback: CallbackQuery) -> None:
         return
 
     await callback.message.delete()
+'''^ /unban ^'''

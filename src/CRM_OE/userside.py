@@ -1,4 +1,9 @@
-from config import logOther, ID_CRM_OE, ID_CRM_OE_ADMIN, delayMsgDelete
+from config import (
+    LOG_OTHERS,
+    ID_CRM_OE, ID_CRM_OE_ADMIN, ID_CRM_OE_NONOFFTOP_THREADS
+)
+from master.functions import delayMessageDelete
+
 from CRM_OE.database.scheme import readUser
 
 from asyncio import create_task
@@ -8,21 +13,21 @@ from aiogram.types import Message
 from aiogram.filters import Command
 
 
-userside = Router()
-NONOFFTOPTOPICS = (43950, 43927, 44448) # Заявления, альянсы, мемы
+rt = Router()
 
 
 
-@userside.message(F.chat.id == ID_CRM_OE, F.message_thread_id.in_(NONOFFTOPTOPICS))
+@rt.message(F.chat.id == ID_CRM_OE, F.message_thread_id.in_(ID_CRM_OE_NONOFFTOP_THREADS))
 async def clearOfftop(message: Message):
+    user = f"@{message.from_user.username}" if message.from_user.username else f"{message.from_user.first_name} ({message.from_user.id})"
+
     if message.text and (message.text.startswith("//") or message.text.startswith("((")):
-        create_task(delayMsgDelete(message, 600))
-        user = f"@{message.from_user.username}" if message.from_user.username else f"{message.from_user.first_name} ({message.from_user.id})"
-        print(f"(+) @CRM_OE: {message.message_thread_id}: создан таймер на удаление оффтопа ({user}).") if logOther else None
+        create_task(delayMessageDelete(message, 600))
+        print(f"(+) @CRM_OE: {message.message_thread_id}: Создан таймер на удаление оффтопа ({user}).") if LOG_OTHERS else None
         
 
-@userside.message(F.chat.id == ID_CRM_OE_ADMIN, Command("who"))
-@userside.message(F.chat.id == ID_CRM_OE_ADMIN, F.text.lower() == "ты кто")
+@rt.message(F.chat.id == ID_CRM_OE_ADMIN, Command("who"))
+@rt.message(F.chat.id == ID_CRM_OE_ADMIN, F.text.lower() == "ты кто")
 async def uniWho(message: Message):
     if not message.reply_to_message:
         await message.delete()

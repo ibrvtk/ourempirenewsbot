@@ -11,10 +11,10 @@
 * Удаление //оффтопа.
 * Добавление игроков в соответствующую БД _(W.I.P.)_. Команда `/who` для идентефикации.
 
-## Дополнительная информация
+## О проекте
 
 * [Python 3.12.3](https://www.python.org/downloads/release/python-3123)
-* W.I.P. 0.3.4
+* W.I.P. 0.3.4.1
 * Гитхаб репозиторий "перекочевал" из `vkuskiy/oerChatBot` _(Нишка)_ _(ныне удалено)_ на `ibrvtk/ourempirenewsbot`.
 * `Type checking` должен быть `off`, что бы избежать "критические" ошибки «Отсутствует проверка на None».
 * Типы уведомлений в терминале:
@@ -34,25 +34,3 @@
 * [`oerChat/databases/appeals.py`](src/oerChat/databases/appeals.py): `getTimeouts()` — [**DeepSeek**](https://www.deepseek.com)
 * [`oerChat/databases/scheduler.py`](src/oerChat/databases/scheduler.py) — [**DeepSeek**](https://www.deepseek.com)
 * [`CRM_OE/database/scheme.py`](src/CRM_OE/database/scheme.py): `readUsers()`, `updateUser()` — [**DeepSeek**](https://www.deepseek.com)
-
-## Файл .env
-
-```
-TOKEN=<token>                              # Токен бота.
-SUPERADMIN=<*user.id>                      # Суперадмин обладает сверхправами и может управлять ботом, даже будучи не записаным в какую-либо БД.
-SUPERADMIN_ARRAY=<*user.id>,<*user.id>,... # Список суперадминов (если понадобится несколько).
-
-
-DB_OER_USERS_PATH=src/oerChat/databases/users.db     # Пусть к oer-БД с данными об активных пользователях.
-DB_OER_APPEALS_PATH=src/oerChat/databases/appeals.db # Пусть к oer-БД с данными об апелляциях и таймаутах.
-
-DB_CRM_PLAYERS_PATH=src/CRM_OE/database/players.db # Пусть к oer-БД с данными об игроках.
-
-
-ID_OERCHAT=-100<chat_id>
-ID_OERCHAT_ADMIN=-100<chat_id>
-ID_OERCHAT_ADMIN_APPEALS_THREAD=<message_thread_id>
-
-ID_CRM_OE=-100<chat_id>
-ID_CRM_OE_ADMIN=-100<chat_id>
-```

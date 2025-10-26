@@ -1,61 +1,40 @@
-from dotenv import load_dotenv
+from dotenv import load_dotenv; load_dotenv()
 from os import getenv
-from asyncio import sleep
 
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
-from aiogram.types import Message
 
 
-load_dotenv()
 TOKEN = getenv('TOKEN')
-bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode='HTML'))
 
-
-# Логгирование в терминале:
-logOther = True # Логгирование информационных сообщений (i) и о создании нового процесса (+).
-logError = True # Логгирование ошибок (X). Непредвиденные ошибки (XX) логируются даже при выключенном параметре.
-
-# ВКЛ/ВЫКЛ работу бота в определённых чатах:
-oerToggle = True # @oerChat (oerChat/*)
-crmToggle = True # @CRM_OE (CRM_OE/*)
+BOT = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode='HTML'))
+PREFIX = getenv('PREFIX')
 
 
 
-async def delayMsgDelete(message: Message, delay: int) -> None:
-    await sleep(delay)
-    try:
-        await message.delete()
-        user = f"@{message.from_user.username}" if message.from_user.username else f"{message.from_user.first_name} ({message.from_user.id})"
-        placeholderText = f"{message.message_thread_id}: удалён оффтоп" if message.chat.id == ID_CRM_OE else "удалено сообщение по отложке"
-        if delay < 60: time_display = f"{delay} секунд"
-        else: delay_minutes = delay // 60; time_display = f"{delay_minutes} минут"
-        # print(f"(V) @{message.chat.username if message.chat.username else message.chat.id}: {placeholderText} от {user} (прошло {time_display} минут).") if logOther else None
+'''Логгирование в терминале'''
+LOG_ERRORS_RAW = getenv('LOG_ERRORS'); LOG_ERRORS = False
+if LOG_ERRORS_RAW == "True": LOG_ERRORS = True # Логгирование ошибок (X). Непредвиденные ошибки (XX) логируются даже при выключенном параметре.
+LOG_OTHERS_RAW = getenv('LOG_OTHERS'); LOG_OTHERS = False
+if LOG_OTHERS_RAW == "True": LOG_OTHERS = True # Логгирование информационных сообщений (i), о создании новых процессов (+) и итогах функций.
+''''''
 
-    except Exception as e:
-        user = f"@{message.from_user.username}" if message.from_user.username else f"{message.from_user.first_name} ({message.from_user.id})"
-        placeholderText = f"{message.message_thread_id}: оффтоп от {user} не был удалён:" if message.chat.id == ID_CRM_OE else f"отложенное удаление сообщения от {user} не произошло:"
-        print(f"(X) @{message.chat.username if message.chat.username else message.chat.id}: {placeholderText} {e}.") if logError else None
-
-
-
-# Префикс для команд бота.
-PREFIX = '!'
-
-# Суперадмин может без прав в боте (БД) управлять им в любом месте.
-SUPERADMIN = int(getenv('SUPERADMIN'))
-'''Cписок суперадминов.'''
-# SUPERADMIN_ARRAY = getenv('SUPERADMIN_ARRAY')
-# SUPERADMIN = [int(admin_id.strip()) for admin_id in SUPERADMIN_ARRAY.split(',')]
+'''ВКЛ/ВЫКЛ работу бота в определённых чатах'''
+TOGGLE_OER_RAW = getenv('TOGGLE_OER'); TOGGLE_OER = False
+if TOGGLE_OER_RAW == "True": TOGGLE_OER = True # @oerChat (oerChat/*)
+TOGGLE_CRM_RAW = getenv('TOGGLE_CRM'); TOGGLE_CRM = False
+if TOGGLE_CRM_RAW == "True": TOGGLE_CRM = True # @CRM_OE (CRM_OE/*)
 ''''''
 
 
-# DB_OER_USERS_PATH = getenv('DB_OER_USERS_PATH')
-DB_OER_APPEALS_PATH = getenv('DB_OER_APPEALS_PATH')
+# Суперадмин может без прав в боте (БД) управлять им в любом месте.
+SUPERADMIN = int(getenv('SUPERADMIN'))
+# Если нужен список суперадминов закомментировать строку выше и раскомментировать две ниже:
+# SUPERADMIN_RAW = getenv('SUPERADMIN_ARRAY')
+# SUPERADMIN = [int(admin_id.strip()) for admin_id in SUPERADMIN_ARRAY.split(',')]
 
-DB_CRM_PATH = getenv('DB_CRM_PLAYERS_PATH')
 
-
+'''Айди чатов, в которых бот работает'''
 # Команды, вводимые только в админ чате (*ADMIN*), выполняются без проверки на наличие роли админа,
 # так что будьте осторожнее с тем, кого Вы добавляте в чат админов.
 ID_OERCHAT = int(getenv('ID_OERCHAT'))
@@ -64,3 +43,13 @@ ID_OERCHAT_ADMIN_APPEALS_THREAD = int(getenv('ID_OERCHAT_ADMIN_APPEALS_THREAD'))
 
 ID_CRM_OE = int(getenv('ID_CRM_OE'))
 ID_CRM_OE_ADMIN = int(getenv('ID_CRM_OE_ADMIN'))
+ID_CRM_OE_NONOFFTOP_THREADS_RAW = getenv('ID_CRM_OE_NONOFFTOP_THREADS')
+ID_CRM_OE_NONOFFTOP_THREADS = [int(thread_id.strip()) for thread_id in ID_CRM_OE_NONOFFTOP_THREADS_RAW.split(',')]
+''''''
+
+'''Пути к базам данных'''
+DB_OER_USERS_PATH = getenv('DB_OER_USERS_PATH')
+DB_OER_APPEALS_PATH = getenv('DB_OER_APPEALS_PATH')
+
+DB_CRM_PATH = getenv('DB_CRM_PLAYERS_PATH')
+''''''
