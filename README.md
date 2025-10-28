@@ -31,6 +31,7 @@
 
 ### Написано с помощью ИИ
 
+* [`oerChat/adminside.py`](src/oerChat/adminside.py): `unbanAdminMessage()` — [**DeepSeek**](https://www.deepseek.com)
 * [`oerChat/databases/appeals.py`](src/oerChat/databases/appeals.py): `getTimeouts()` — [**DeepSeek**](https://www.deepseek.com)
 * [`oerChat/databases/scheduler.py`](src/oerChat/databases/scheduler.py) — [**DeepSeek**](https://www.deepseek.com)
 * [`CRM_OE/database/scheme.py`](src/CRM_OE/database/scheme.py): `readUsers()`, `updateUser()` — [**DeepSeek**](https://www.deepseek.com)

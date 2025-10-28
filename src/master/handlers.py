@@ -47,11 +47,10 @@ async def uniStart(message: Message) -> None: # Временное решени�
 async def cmdCancel(message: Message, state: FSMContext) -> None: # Написано убого. Временное решение.
     user_id = message.from_user.id
 
+    try: oerAdminside.unbanWriteAppealIdInDB(user_id, state)
+    except: pass
+
     try: await state.clear()
-    except: pass
-    try: del oerAdminside.appealData[user_id]
-    except: pass
-    try: del oerAdminside.messagesData[user_id]
     except: pass
 
     await message.answer("✅ <b>Текущая операция отменена.</b>",
