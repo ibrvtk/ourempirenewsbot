@@ -6,6 +6,7 @@ from aiogram.client.default import DefaultBotProperties
 
 
 TOKEN = getenv('TOKEN')
+ID = int(getenv('ID'))
 
 BOT = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode='HTML'))
 PREFIX = getenv('PREFIX')

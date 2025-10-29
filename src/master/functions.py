@@ -27,5 +27,7 @@ async def delayMessageDelete(message: Message, delay: int) -> None: # Отлож
 
         if "message can't be deleted" in str(e):
             print(f"(X) @{message.chat.username if message.chat.username else message.chat.id}: {placeholderText}: Бот не смог удалить сообщение. У него есть права?") if LOG_ERRORS else None
+        elif "message to delete not found" in str(e):
+            print(f"(X) @{message.chat.username if message.chat.username else message.chat.id}: {placeholderText}: Бот не смог удалить сообщение. Оно уже удалено?") if LOG_ERRORS else None
         else:
             print(f"(XX) @{message.chat.username if message.chat.username else message.chat.id}: {placeholderText}: {e}.")

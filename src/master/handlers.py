@@ -1,5 +1,6 @@
 from config import (
     TOGGLE_OER, TOGGLE_CRM,
+    ID_CRM_OE_ADMIN,
     LOG_ERRORS, LOG_OTHERS,
     SUPERADMIN, PREFIX
 )
@@ -16,6 +17,7 @@ from aiogram import Router, F
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+from aiogram.filters.command import CommandObject
 
 
 rt = Router()
@@ -35,10 +37,12 @@ async def cmdDb(message: Message) -> None:
         except Exception as e:
             print(f"(XX) main.py: uniStart(): {e}.")
 
-@rt.message(Command("start"))
+# @rt.message(Command("start"))
+# async def cmdStart
+
 @rt.message(F.text.lower() == "бот")
 @rt.message(F.text.lower() == f"{PREFIX}бот")
-async def uniStart(message: Message) -> None: # Временное решение. В будущем будет роадмап по командам бота.
+async def fcmdCheck(message: Message) -> None: # Временное решение. В будущем будет роадмап по командам бота.
     await message.reply("✅ На месте")
 
 
@@ -55,3 +59,27 @@ async def cmdCancel(message: Message, state: FSMContext) -> None: # Написа
         
     except Exception as e:
         print(f"(XX) master/handlers: cmdCancel(): {e}.")
+
+
+@rt.message(Command('help'))
+async def cmd(message: Message, command: CommandObject):
+    if command.args is None:
+        await message.reply("Coming soon")
+        return
+    
+    args = command.args.split()
+
+    if message.chat.id == ID_CRM_OE_ADMIN:
+        if args[0] == "user":
+            await message.reply(
+                "🗃️ <b>Команда <code>user</code></b>\n"
+                "БД — база данных. Она хранит в себе данные всех игроков и тех, кто когда-то был им. "
+                "Она содержит в себе информацию об уровне админки, количестве очков, репутации, "
+                "название страны, флаг страны, жив ли игрок "
+                "и информацию о ходе (текст, медиафайлы, отправлен ли).\n\n"
+                "🛄 <code>/user [создать/добавить/create/touch] [TG-ID]</code> — добавление в БД.\n\n"
+                "🛂 <code>/user [прочитать/read/cat] [TG-ID]</code> — список данных.\n\n"
+                "📝 <code>/user [изменить/update/nano] [TG-ID]* [админка]* [очки]* [репутация]* [название страны] [флаг] [капитулирован?]**</code> — изменение данных, "
+                "где звёздочка обозначает цифровые значения, а двойная — 1 и 0, что является True и False. Важно прописать все параметры, даже если Вы их не меняете.\n\n"
+                "🗑️ <code>/user [удалить/delete/rm] [TG-ID]</code> — удаление из БД."
+            )

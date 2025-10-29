@@ -41,6 +41,25 @@ async def createOrUpdateUser(user_id: int, adminLevel: int, points: int, reputat
         return False
 
 
+# U
+async def updateReputation(user_id: int, reputation: int):
+    try:
+        async with connect(DB_CRM_PATH) as db:
+            await db.execute("""
+                UPDATE players 
+                SET reputation = ?
+                WHERE user_id = ?
+            """, (reputation, user_id))
+            await db.commit()
+
+            print("(V) CRM_OE/database/scheme.py: updateReputation(): Успех.") if LOG_OTHERS else None
+            return True
+
+    except Exception as e:
+        print(f"(XX) CRM_OE/database/scheme.py: updateReputation(): {e}.")
+        return False
+
+
 # R
 async def readUser(user_id: int):
     try:

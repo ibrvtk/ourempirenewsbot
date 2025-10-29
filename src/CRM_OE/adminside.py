@@ -5,18 +5,17 @@ from config import (
     PREFIX, SUPERADMIN
 )
 
-from CRM_OE.keyboards import adminpanelKeyboard
-from CRM_OE.database.scheme import createOrUpdateUser, readUser
+from CRM_OE.database.scheme import createOrUpdateUser, readUser, deleteUser
 
 from aiogram import F, Router
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message
 from aiogram.filters import Command
-from aiogram.fsm.state import State, StatesGroup
-from aiogram.fsm.context import FSMContext
 from aiogram.filters.command import CommandObject
 
 
 rt = Router()
+
+help_user_notice = "Не знаете как пользоваться командой? Пропишите <code>/help user</code>"
 
 
 
@@ -29,30 +28,31 @@ async def cmd(message: Message, command: CommandObject):
         return
     
     if command.args is None:
-        await message.reply("Error #1: Аргументы отсутствуют.")
+        await message.reply(f"❌ <b>Ошибка.</b> Отсутствуют аргументы.\n{help_user_notice}.")
         return
     
     args = command.args.split()
 
     if len(args) == 1:
-        await message.reply("Error #2: Неккоректное количество аргументов.")
+        await message.reply(f"❌ <b>Ошибка.</b> Слишком мало аргументов.\n{help_user_notice}.")
         return
     
     elif len(args) == 2:
-        if args[0] in ("добавить", "create", "touch"):
+        if args[0] in ("создать", "добавить", "create", "touch"):
             try:
                 user_id = int(args[1])
                 user = await BOT.get_chat(user_id)
                 await createOrUpdateUser(user_id, 0, 0, 0, "None", "🏴", 0, "None", "None", 0)
                 user_user = f"@{user.username}" if user.username else f"{user.first_name} (<code>{user.id}</code>)"
-                await message.reply(f"🛂 <b>{user_user} успешно добавлен в БД.</b>")
+                await message.reply(f"✅ <b>{user_user} добавлен в БД.</b>")
+
             except ValueError:
-                await message.reply("Error #3.2: ValueError. Не удалось прочитать TG-ID человека.")
+                await message.reply("❌ <b>Ошибка.</b> Некорректный Телеграм ID.")
                 return
             except Exception as e:
                 await message.reply(f"❌ <b>Ошибка.</b> Возможно у бота нет переписки с этим человеком. "
                                     "Во всяком случае, бот не может установить с ним связь.\n\n"
-                                    f"<blockquote><b>Код ошибки:</b>\n{e}</blockquote>")
+                                    f"<blockquote><b>Raw вид ошибки:</b>\n{e}</blockquote>")
 
         if args[0] in ("прочитать", "read", "cat"):
             try:
@@ -103,13 +103,36 @@ async def cmd(message: Message, command: CommandObject):
                                     f"{turnIsSended}"
                                     f"\n{outro}"
                                     f"<code>{user_data_for_nano}</code>")
+
             except ValueError:
-                await message.reply("Error #3.1: ValueError. Не удалось прочитать TG-ID человека.")
+                await message.reply("❌ <b>Ошибка.</b> Некорректный Телеграм ID.")
                 return
             except Exception as e:
                 await message.reply(f"❌ <b>Ошибка.</b> Возможно у бота нет переписки с этим человеком или его просто нет в БД. "
                                     "Во всяком случае, бот не может установить с ним связь.\n\n"
-                                    f"<blockquote><b>Код ошибки:</b>\n{e}</blockquote>")
+                                    f"<blockquote><b>Raw вид ошибки:</b>\n{e}</blockquote>")
+                
+        if args[0] in ("удалить", "delete", "rm"):
+            try:
+                user_id = int(args[1])
+                try: await deleteUser(user_id)
+                except: pass
+
+                try:
+                    user = await BOT.get_chat(user_id)
+                    user_user = f"@{user.username}" if user.username else f"{user.first_name} (<code>{user.id}</code>)"
+                    text = f"🗑️ <b>Данные {user_user} удалены.</b>"
+                except:
+                    text = f"🗑️ <b>Данные <code>{user_id}</code> удалены.</b>"
+                    
+                await message.reply(f"{text}")
+
+            except ValueError:
+                await message.reply("❌ <b>Ошибка.</b> Некорректный Телеграм ID.")
+                return
+            except Exception as e:
+                await message.reply(f"❌ <b>Ошибка!</b> Причина неясна.\n\n"
+                                    f"<blockquote><b>Raw вид ошибки:</b>\n{e}</blockquote>")
                 
     elif len(args) == 8:
         if args[0] in ("изменить", "update", "nano"):
@@ -119,21 +142,22 @@ async def cmd(message: Message, command: CommandObject):
                 adminLevel = int(args[2])
                 points = int(args[3])
                 reputation = int(args[4])
-                countryName = f"{str(args[5]).replace("_", " ")}"
+                countryName = f"{str(args[5])}"
                 countryFlag = f"{str(args[6])}"
                 countryStatus = int(args[7])
 
                 user = await BOT.get_chat(user_id)
                 await createOrUpdateUser(user_id, adminLevel, points, reputation, countryName, countryFlag, countryStatus, user_data[7], user_data[8], user_data[9])
                 user_user = f"@{user.username}" if user.username else f"{user.first_name} (<code>{user.id}</code>)"
-                await message.reply(f"🛂 <b>{user_user} успешно добавлен в БД.</b>")
+                await message.reply(f"✅ <b>Данные {user_user} изменены.</b>")
+
             except ValueError:
-                await message.reply("Error #3.3: ValueError. Не удалось прочитать TG-ID человека.")
+                await message.reply("❌ <b>Ошибка.</b> Некорректный Телеграм ID.")
                 return
             except Exception as e:
                 await message.reply(f"❌ <b>Ошибка.</b> Возможно у бота нет переписки с этим человеком. "
                                     "Во всяком случае, бот не может установить с ним связь.\n\n"
-                                    f"<blockquote><b>Код ошибки:</b>\n{e}</blockquote>")
+                                    f"<blockquote><b>Raw вид ошибки:</b>\n{e}</blockquote>")
 
     else:
-        await message.reply("Error #4")
+        await message.reply("❌ <b>Ошибка.</b> Слишком много аргументов.")
