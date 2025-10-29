@@ -1,7 +1,7 @@
 from config import (
     BOT,
     LOG_ERRORS,
-    ID_OERCHAT_ADMIN, ID_OERCHAT_ADMIN_APPEALS_THREAD,
+    ID_OERCHAT_ADMIN, ID_OERCHAT_ADMIN_BOT_THREAD,
     PREFIX, SUPERADMIN
 )
 
@@ -217,7 +217,7 @@ async def unbanAppellantMessage(message: Message, state: FSMContext) -> None: # 
 
             toAdmin_message = await BOT.send_message(
                 chat_id=ID_OERCHAT_ADMIN,
-                message_thread_id=ID_OERCHAT_ADMIN_APPEALS_THREAD,
+                message_thread_id=ID_OERCHAT_ADMIN_BOT_THREAD,
                 text=f"🆘 <b>Новая апелляция</b> — {appellant_user}\n"
                      f"<blockquote>{message.text}</blockquote>",
                     reply_markup=unbanKeyboard_(appeal_id)
@@ -288,7 +288,9 @@ async def unbanCbAppealAccept(callback: CallbackQuery, state: FSMContext) -> Non
 
     except TelegramBadRequest as e:
         await callback.answer("❓ Апелляция не найдена")
-        await callback.message.reply("❌ <b>Ошибка.</b> Возможно этот человек удалил переписку с ботом. Во всяком случае, бот не может установить с ним связь. Апелляция была закрыта.")
+        await callback.message.reply("❌ <b>Ошибка.</b> Возможно этот человек удалил переписку с ботом. "
+                                     "Во всяком случае, бот не может установить с ним связь. Апелляция была закрыта.\n\n"
+                                     f"<blockquote><b>Код ошибки:</b>\n{e}</blockquote>")
         await callback.message.edit_reply_markup(reply_markup=None)
         print(f"(X) oerChat/adminside.py: unbanCbAppealAccept(): TelegramBadRequest: {e}.") if LOG_ERRORS else None
         await unbanWriteAppealIdInDB(appellant_id, state)
@@ -657,7 +659,7 @@ async def unbanCbAppealMessageHistoryNext(callback: CallbackQuery) -> None:
 
 
 # Админ отправил сообщение.
-@rt.message(F.chat.id == ID_OERCHAT_ADMIN, F.message_thread_id == ID_OERCHAT_ADMIN_APPEALS_THREAD, F.reply_to_message != None, F.text)
+@rt.message(F.chat.id == ID_OERCHAT_ADMIN, F.message_thread_id == ID_OERCHAT_ADMIN_BOT_THREAD, F.reply_to_message != None, F.text)
 async def unbanAdminMessage(message: Message) -> None:
     global appealData
     appellant_id = None
@@ -686,7 +688,7 @@ async def unbanAdminMessage(message: Message) -> None:
 # Люто очистить всю память appealData и messagesData .
 @rt.message(F.chat.id == ID_OERCHAT_ADMIN, F.from_user.id == SUPERADMIN, F.text.lower() == f"{PREFIX}очистить апелляции")
 async def unbanClearData(message: Message) -> None:
-    if message.message_thread_id != ID_OERCHAT_ADMIN_APPEALS_THREAD:
+    if message.message_thread_id != ID_OERCHAT_ADMIN_BOT_THREAD:
         await message.reply("Эту команду можно вводить только в топике с <a href='https://t.me/c/2062958469/65368'>жалобами</a>.")
         return
 

@@ -1,56 +1,139 @@
-from config import BOT, LOG_ERRORS, ID_CRM_OE_ADMIN
-from CRM_OE.database.scheme import updateUser
-import CRM_OE.keyboards as kb
+from config import (
+    BOT,
+    LOG_ERRORS,
+    ID_CRM_OE_ADMIN, ID_CRM_OE_ADMIN_BOT_THREAD,
+    PREFIX, SUPERADMIN
+)
+
+from CRM_OE.keyboards import adminpanelKeyboard
+from CRM_OE.database.scheme import createOrUpdateUser, readUser
 
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+from aiogram.filters.command import CommandObject
 
 
 rt = Router()
 
-fsmPlaceholderTextRetry = "Попробуйте снова или отмените действие (/cancel)."
 
 
-
-@rt.message(F.chat.id == ID_CRM_OE_ADMIN, Command("adminpanel"))
-async def cmdAdminpanel(message: Message):
-    await message.reply("📝 <b>Изменить права</b> — изменить права конкретного человека <i>(сделать игроком, админом и любой другой параметр)</i>.\n\n"
-                        "📜 <b>Список всех игроков</b> — список всех людей в БД ЦРМ.",
-                        reply_markup=kb.adminpanelKeyboard)
+@rt.message(F.chat.id == ID_CRM_OE_ADMIN, Command("user"))
+async def cmd(message: Message, command: CommandObject):
+    if message.message_thread_id != ID_CRM_OE_ADMIN_BOT_THREAD:
+        cleared_chat_id = str(message.chat.id).replace("-100", "")
+        link = f"https://t.me/c/{cleared_chat_id}/{ID_CRM_OE_ADMIN_BOT_THREAD}"
+        await message.reply(f"Эту команду можно использовать только в <a href='{link}'>топике бота</a>.")
+        return
     
-
-class fsmAdminpanelEditRights(StatesGroup):
-    text = State()
-
-@rt.callback_query(F.data == "adminpanelEditRights")
-async def cbAdminpanelEditRights(callback: CallbackQuery, state: FSMContext):
-    await state.set_state(fsmAdminpanelEditRights.text)
-    await callback.message.edit_text("<b>Использование:</b> user_id, поле=значение, поле2=значение2 и так далее.")
-
-@rt.message(fsmAdminpanelEditRights.text)
-async def fsmAdminpanelEditRightsText(message: Message, state: FSMContext):
-    await state.clear()
-    text = message.text
-
-    try:
-        parts = [part.strip() for part in text.split(',')]
-        user_id = int(parts[0])
-        
-        updates = {}
-        for part in parts[1:]:
-            if '=' in part:
-                key, value = part.split('=', 1)
-                updates[key.strip()] = value.strip()
-        
-        await updateUser(user_id, **updates)
-
-        user = await BOT.get_chat(user_id)
-        userMention = f"@{user.username}" if user.username else f"{user.id} {user.first_name}"
-        await message.reply(f"Человеку <b>{userMention}</b> изменены параметры <i>(<code>{text}</code>)</i>.")
+    if command.args is None:
+        await message.reply("Error #1: Аргументы отсутствуют.")
+        return
     
-    except (ValueError, IndexError) as e:
-        await message.reply(f"❌ <b>Ошибка!</b> Использование: user_id, поле=значение, поле2=значение2 и так далее.\n{fsmPlaceholderTextRetry}")
-        print(f"(X) CRM_OE/app/adminside.py: fsmAdminpanelEditRightsText(): {e}.") if LOG_ERRORS else None
+    args = command.args.split()
+
+    if len(args) == 1:
+        await message.reply("Error #2: Неккоректное количество аргументов.")
+        return
+    
+    elif len(args) == 2:
+        if args[0] in ("добавить", "create", "touch"):
+            try:
+                user_id = int(args[1])
+                user = await BOT.get_chat(user_id)
+                await createOrUpdateUser(user_id, 0, 0, 0, "None", "🏴", 0, "None", "None", 0)
+                user_user = f"@{user.username}" if user.username else f"{user.first_name} (<code>{user.id}</code>)"
+                await message.reply(f"🛂 <b>{user_user} успешно добавлен в БД.</b>")
+            except ValueError:
+                await message.reply("Error #3.2: ValueError. Не удалось прочитать TG-ID человека.")
+                return
+            except Exception as e:
+                await message.reply(f"❌ <b>Ошибка.</b> Возможно у бота нет переписки с этим человеком. "
+                                    "Во всяком случае, бот не может установить с ним связь.\n\n"
+                                    f"<blockquote><b>Код ошибки:</b>\n{e}</blockquote>")
+
+        if args[0] in ("прочитать", "read", "cat"):
+            try:
+                user_id = int(args[1])
+                user_data = await readUser(user_id)
+                if not user_data:
+                    await message.reply("❌ <b>Ошибка.</b> Пользователя нет в БД.\n"
+                                        f"Добавить можно командой <code>/user добавить {user_id}</code>.")
+                    return
+                
+                countryName = str(user_data[4]).replace("_", " ")
+                countryNameWithFlag = f"{user_data[5]} {countryName}" if user_data[4] != "None" else "Это не игрок"
+                match user_data[6]:
+                    case 0:
+                        if user_data[4] == "None":
+                            countryStatus = ""
+                        else:
+                            countryStatus = "<b>Статус страны:</b> Капитулировал\n"
+                    case 1:
+                        countryStatus = "<b>Статус страны:</b> Пока жив\n"
+
+                if user_data[6] == 1:
+                    turnIsSended = "<b>Статус хода:</b> Отправлен\n" if user_data[9] == 1 else "<b>Статус хода:</b> Не отправлен\n"
+                elif user_data[6] == 0:
+                    turnIsSended = ""
+
+                cursed_symbols = ("(", ")", ",", "'")
+                user_data_for_nano = str(user_data)
+                for symbol in cursed_symbols:
+                    user_data_for_nano = user_data_for_nano.replace(symbol, "")
+                user_data_for_nano = f"/user изменить {user_data_for_nano}"
+
+                try:
+                    user = await BOT.get_chat(user_id)
+                    user_user = f"@{user.username}" if user.username else f"{user.first_name} (<code>{user.id}</code>)"
+                    intro = f"🛂 <b>Данные {user_user}</b>"
+                    outro = ""
+                except:
+                    intro = f"🛂 <b>Данные <code>{user_id}</code></b>"
+                    outro = "<i>Нет переписки с ботом</i>\n"
+
+                await message.reply(f"{intro}\n\n"
+                                    f"<b>Уровень администрации:</b> {user_data[1]}\n"
+                                    f"<b>Количество очков:</b> {user_data[2]}\n"
+                                    f"<b>Репутация:</b> {user_data[3]}\n"
+                                    f"<b>Страна:</b> {countryNameWithFlag}\n"
+                                    f"{countryStatus}"
+                                    f"{turnIsSended}"
+                                    f"\n{outro}"
+                                    f"<code>{user_data_for_nano}</code>")
+            except ValueError:
+                await message.reply("Error #3.1: ValueError. Не удалось прочитать TG-ID человека.")
+                return
+            except Exception as e:
+                await message.reply(f"❌ <b>Ошибка.</b> Возможно у бота нет переписки с этим человеком или его просто нет в БД. "
+                                    "Во всяком случае, бот не может установить с ним связь.\n\n"
+                                    f"<blockquote><b>Код ошибки:</b>\n{e}</blockquote>")
+                
+    elif len(args) == 8:
+        if args[0] in ("изменить", "update", "nano"):
+            try:
+                user_id = int(args[1])
+                user_data = await readUser(user_id)
+                adminLevel = int(args[2])
+                points = int(args[3])
+                reputation = int(args[4])
+                countryName = f"{str(args[5]).replace("_", " ")}"
+                countryFlag = f"{str(args[6])}"
+                countryStatus = int(args[7])
+
+                user = await BOT.get_chat(user_id)
+                await createOrUpdateUser(user_id, adminLevel, points, reputation, countryName, countryFlag, countryStatus, user_data[7], user_data[8], user_data[9])
+                user_user = f"@{user.username}" if user.username else f"{user.first_name} (<code>{user.id}</code>)"
+                await message.reply(f"🛂 <b>{user_user} успешно добавлен в БД.</b>")
+            except ValueError:
+                await message.reply("Error #3.3: ValueError. Не удалось прочитать TG-ID человека.")
+                return
+            except Exception as e:
+                await message.reply(f"❌ <b>Ошибка.</b> Возможно у бота нет переписки с этим человеком. "
+                                    "Во всяком случае, бот не может установить с ним связь.\n\n"
+                                    f"<blockquote><b>Код ошибки:</b>\n{e}</blockquote>")
+
+    else:
+        await message.reply("Error #4")

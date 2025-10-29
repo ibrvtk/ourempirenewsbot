@@ -39,10 +39,11 @@ SUPERADMIN = int(getenv('SUPERADMIN'))
 # так что будьте осторожнее с тем, кого Вы добавляте в чат админов.
 ID_OERCHAT = int(getenv('ID_OERCHAT'))
 ID_OERCHAT_ADMIN = int(getenv('ID_OERCHAT_ADMIN'))
-ID_OERCHAT_ADMIN_APPEALS_THREAD = int(getenv('ID_OERCHAT_ADMIN_APPEALS_THREAD'))
+ID_OERCHAT_ADMIN_BOT_THREAD = int(getenv('ID_OERCHAT_ADMIN_BOT_THREAD'))
 
 ID_CRM_OE = int(getenv('ID_CRM_OE'))
 ID_CRM_OE_ADMIN = int(getenv('ID_CRM_OE_ADMIN'))
+ID_CRM_OE_ADMIN_BOT_THREAD = int(getenv('ID_CRM_OE_ADMIN_BOT_THREAD'))
 ID_CRM_OE_NONOFFTOP_THREADS_RAW = getenv('ID_CRM_OE_NONOFFTOP_THREADS')
 ID_CRM_OE_NONOFFTOP_THREADS = [int(thread_id.strip()) for thread_id in ID_CRM_OE_NONOFFTOP_THREADS_RAW.split(',')]
 ''''''

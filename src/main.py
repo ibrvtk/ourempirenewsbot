@@ -2,8 +2,8 @@ from config import (
     BOT,
     TOGGLE_OER, TOGGLE_CRM,
     LOG_OTHERS,
-    ID_OERCHAT_ADMIN, ID_OERCHAT_ADMIN_APPEALS_THREAD,
-    ID_CRM_OE_ADMIN
+    ID_OERCHAT_ADMIN, ID_OERCHAT_ADMIN_BOT_THREAD,
+    ID_CRM_OE_ADMIN, ID_CRM_OE_ADMIN_BOT_THREAD
 )
 
 import master.handlers as mHandlers
@@ -19,6 +19,7 @@ import CRM_OE.database.scheme as crmDB
 from asyncio import create_task, run
 
 from aiogram import Dispatcher
+from aiogram.exceptions import TelegramBadRequest
 
 
 dp = Dispatcher()
@@ -36,7 +37,8 @@ async def main() -> None:
         await oerDB.createTableAppeals()
         create_task(schedulerAppealsTimeout())
         print("(i) Запуск бота: oer: БД подключена.") if LOG_OTHERS else None
-        ADMIN_CHATS.append(ID_OERCHAT_ADMIN); print("(V) Запуск бота: oer: Полностью подключен.")
+        ADMIN_CHATS.append((ID_OERCHAT_ADMIN, ID_OERCHAT_ADMIN_BOT_THREAD))
+        print("(V) Запуск бота: oer: Полностью подключен.")
 
     if TOGGLE_CRM:
         dp.include_router(crmUserside.rt)
@@ -45,12 +47,13 @@ async def main() -> None:
         print("(i) Запуск бота: crm: Админский обработчик подключен.") if LOG_OTHERS else None
         await crmDB.createTable()
         print("(i) Запуск бота: crm: БД подключена.") if LOG_OTHERS else None
-        ADMIN_CHATS.append(ID_CRM_OE_ADMIN); print("(V) Запуск бота: crm: полностью подключен.")
+        ADMIN_CHATS.append((ID_CRM_OE_ADMIN, ID_CRM_OE_ADMIN_BOT_THREAD))
+        print("(V) Запуск бота: crm: полностью подключен.")
 
-    for chat in ADMIN_CHATS:
+    for chat_id, topic_id in ADMIN_CHATS:
         await BOT.send_message(
-            chat_id=chat,
-            message_thread_id=ID_OERCHAT_ADMIN_APPEALS_THREAD if chat == ID_OERCHAT_ADMIN else None,
+            chat_id=chat_id,
+            message_thread_id=topic_id,
             text="<code>hola amigos por favor</code>"
         )
         

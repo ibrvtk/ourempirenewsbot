@@ -1,45 +1,53 @@
-from config import LOG_ERRORS, DB_CRM_PATH
+from config import (
+    DB_CRM_PATH,
+    LOG_ERRORS, LOG_OTHERS
+)
 
 from aiosqlite import connect
 
 
 
-async def createTable():                
+# CU
+async def createTable() -> None:
     try:
         async with connect(DB_CRM_PATH) as db:
             with open('src/CRM_OE/database/scheme.sql', 'r', encoding='utf-8') as file:
                 sql_script = file.read()
             await db.executescript(sql_script)
             await db.commit()
-        print("(V) CRM_OE/database/scheme.py: createTable(): успех.") if LOG_ERRORS else None
+            print("(V) CRM_OE/database/scheme.py: createTable(): Успех.") if LOG_OTHERS else None
 
     except Exception as e:
-        print(f"(XXX) CRM_OE/database/scheme.py: createTable(): {e}.")
+        print(f"(XX) CRM_OE/database/scheme.py: createTable(): {e}.")
 
 
-async def createUser(user_id: int, points: int = 0, adminLevel: int = 0,
-              country: str = "None", eventsType: int = 0,
-              moveText: str = "None", moveMediafiles: str = "None", moveIsSended: int = 0):
+async def createOrUpdateUser(user_id: int, adminLevel: int, points: int, reputation: int,
+                             countryName: str, countryFlag: str, countryStatus: int,
+                             turnText: str, turnMediafiles: str, turnIsSended: int):
     try:
         async with connect(DB_CRM_PATH) as db:
-            cursor = await db.execute("""
-                INSERT INTO players (user_id, points, adminLevel, country, eventsType, moveText, moveMediafiles, moveIsSended)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (user_id, points, adminLevel, country, eventsType, moveText, moveMediafiles, moveIsSended))
+            await db.execute("""
+                INSERT OR REPLACE INTO players 
+                (user_id, adminLevel, points, reputation, countryName, countryFlag, countryStatus, turnText, turnMediafiles, turnIsSended)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (user_id, adminLevel, points, reputation, countryName, countryFlag, countryStatus, turnText, turnMediafiles, turnIsSended))
             await db.commit()
-            print("(V) CRM_OE/database/scheme.py: createUser(): успех.") if LOG_ERRORS else None
-            return cursor.lastrowid
+
+            print("(V) CRM_OE/database/scheme.py: createOrUpdateUser(): Успех.") if LOG_OTHERS else None
+            return True
 
     except Exception as e:
-        print(f"(XX) CRM_OE/database/scheme.py: createUser(): {e}.")
+        print(f"(XX) CRM_OE/database/scheme.py: createOrUpdateUser(): {e}.")
+        return False
 
 
+# R
 async def readUser(user_id: int):
     try:
         async with connect(DB_CRM_PATH) as db:
             async with db.execute("SELECT * FROM players WHERE user_id = ?", (user_id,)) as cursor:
                 user_data = await cursor.fetchone()
-                print("(V) CRM_OE/database/scheme.py: readUser(): успех.") if LOG_ERRORS else None
+                print("(V) CRM_OE/database/scheme.py: readUser(): Успех.") if LOG_OTHERS else None
                 return user_data
     except Exception as e:
         print(f"(XX) CRM_OE/database/scheme.py: readUser(): {e}.")
@@ -50,34 +58,20 @@ async def readUsers():
         async with connect(DB_CRM_PATH) as db:
             async with db.execute("SELECT * FROM players") as cursor:
                 users = await cursor.fetchall()
-                print("(V) CRM_OE/database/scheme.py: readUsers(): успех.") if LOG_ERRORS else None
+                print("(V) CRM_OE/database/scheme.py: readUsers(): Успех.") if LOG_OTHERS else None
                 return users
     except Exception as e:
         print(f"(XX) CRM_OE/database/scheme.py: readUsers(): {e}.")
         return []
-    
 
-async def updateUser(user_id: int, **kwargs):
-    try:
-        async with connect(DB_CRM_PATH) as db:
-            setClause = ", ".join([f"{key} = ?" for key in kwargs.keys()])
-            values = list(kwargs.values())
-            values.append(user_id)
-            
-            await db.execute(f"UPDATE players SET {setClause} WHERE user_id = ?", values)
-            await db.commit()
-            print("(V) CRM_OE/database/scheme.py: updateUser(): успех.") if LOG_ERRORS else None
 
-    except Exception as e:
-        print(f"(XX) CRM_OE/database/scheme.py: updateUser(): {e}.")
-    
-
-async def deleteUser(user_id: int):
+# D
+async def deleteUser(user_id: int) -> None:
     try:
         async with connect(DB_CRM_PATH) as db:
             await db.execute("DELETE FROM players WHERE user_id = ?", (user_id,))
             await db.commit()
-            print("(V) CRM_OE/database/scheme.py: deleteUser(): успех.") if LOG_ERRORS else None
+            print("(V) CRM_OE/database/scheme.py: deleteUser(): Успех.") if LOG_OTHERS else None
 
     except Exception as e:
         print(f"(XX) CRM_OE/database/scheme.py: deleteUser(): {e}.")
