@@ -21,9 +21,9 @@ async def createTable() -> None:
         print(f"(XX) CRM_OE/database/scheme.py: createTable(): {e}.")
 
 
-async def createOrUpdateUser(user_id: int, adminLevel: int, points: int, reputation: int,
-                             countryName: str, countryFlag: str, countryStatus: int,
-                             turnText: str, turnMediafiles: str, turnIsSended: int):
+async def createOrUpdateUser(user_id: int, adminLevel: int = 0, points: int = 0, reputation: int = 0,
+                             countryName: str = "None", countryFlag: str = "🏴", countryStatus: int = 0,
+                             turnText: str = "None", turnMediafiles: str = "None", turnIsSended: int = 0):
     try:
         async with connect(DB_CRM_PATH) as db:
             await db.execute("""

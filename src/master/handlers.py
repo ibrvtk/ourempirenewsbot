@@ -1,7 +1,8 @@
 from config import (
     TOGGLE_OER, TOGGLE_CRM,
+    #ID_OERCHAT_ADMIN,
     ID_CRM_OE_ADMIN,
-    LOG_ERRORS, LOG_OTHERS,
+    LOG_ERRORS,# LOG_OTHERS,
     SUPERADMIN, PREFIX
 )
 
@@ -12,6 +13,8 @@ import oerChat.adminside as oerAdminside
 # import CRM_OE.userside as crmUserside
 # import CRM_OE.adminside as crmAdminside
 import CRM_OE.database.scheme as crmDB
+
+from re import compile
 
 from aiogram import Router, F
 from aiogram.types import Message, ReplyKeyboardRemove
@@ -36,6 +39,7 @@ async def cmdDb(message: Message) -> None:
             await message.reply("✅ Успех")
         except Exception as e:
             print(f"(XX) main.py: uniStart(): {e}.")
+            return
 
 # @rt.message(Command("start"))
 # async def cmdStart
@@ -58,7 +62,11 @@ async def cmdCancel(message: Message, state: FSMContext) -> None: # Написа
                                 reply_markup=ReplyKeyboardRemove())
         
     except Exception as e:
-        print(f"(XX) master/handlers: cmdCancel(): {e}.")
+        if int(e) == user_id:
+            print(f"(X) master/handlers: cmdCancel(): У {user_id} нечего отменять.") if LOG_ERRORS else None
+        else:
+            print(f"(XX) master/handlers: cmdCancel(): {e}.")
+        return
 
 
 @rt.message(Command('help'))
@@ -69,17 +77,39 @@ async def cmd(message: Message, command: CommandObject):
     
     args = command.args.split()
 
+    user_id = message.from_user.id
+
     if message.chat.id == ID_CRM_OE_ADMIN:
+        user_data = await crmDB.readUser(user_id)
+        if not user_data: return
+
         if args[0] == "user":
-            await message.reply(
-                "🗃️ <b>Команда <code>user</code></b>\n"
-                "БД — база данных. Она хранит в себе данные всех игроков и тех, кто когда-то был им. "
-                "Она содержит в себе информацию об уровне админки, количестве очков, репутации, "
-                "название страны, флаг страны, жив ли игрок "
-                "и информацию о ходе (текст, медиафайлы, отправлен ли).\n\n"
-                "🛄 <code>/user [создать/добавить/create/touch] [TG-ID]</code> — добавление в БД.\n\n"
-                "🛂 <code>/user [прочитать/read/cat] [TG-ID]</code> — список данных.\n\n"
-                "📝 <code>/user [изменить/update/nano] [TG-ID]* [админка]* [очки]* [репутация]* [название страны] [флаг] [капитулирован?]**</code> — изменение данных, "
-                "где звёздочка обозначает цифровые значения, а двойная — 1 и 0, что является True и False. Важно прописать все параметры, даже если Вы их не меняете.\n\n"
-                "🗑️ <code>/user [удалить/delete/rm] [TG-ID]</code> — удаление из БД."
-            )
+            title =       "🗃️ <b>Команда <code>user</code></b>"
+            description = "БД — база данных. Она хранит в себе данные всех игроков и тех, кто когда-то был им." \
+                          "Она содержит в себе информацию об уровне админки, количестве очков, репутации, " \
+                          "название страны, флаг страны, жив ли игрок " \
+                          "и информацию о ходе (текст, медиафайлы, отправлен ли)."
+            touch =       "🛄 <code>/user [создать/добавить/create/add/touch] [TG-ID]</code> — добавление в БД."
+            cat =         "🛂 <code>/user [прочитать/read/cat] [TG-ID]</code> — список данных."
+            nano_outro =  "Важно прописать все параметры, даже если Вы их не меняете."
+            rm =          "🗑️ <code>/user [удалить/delete/rm] [TG-ID]</code> — удаление из БД."
+            hashtags =    "<i>ЦРМ, Админская команда, БД</i>"
+
+            match int(user_data[1]):
+                case 21:
+                    nano = "📝 <code>/user [изменить/update/nano] [TG-ID]* [название_страны] [флаг]</code> — изменение данных, " \
+                           f"где звёздочка обозначает цифровое значение. {nano_outro}"
+                    await message.reply(f"{title}\n{description}\n\n{touch}\n{cat}\n{nano}\n\n{hashtags}")
+
+                case 22:
+                    nano = "📝 <code>/user [изменить/update/nano] [TG-ID]* [название_страны] [флаг] [капитулирован?]**</code> — изменение данных, " \
+                           f"где звёздочка обозначает цифровое значение, а двойная от 0 до 1, что является True и False. {nano_outro}"
+                    await message.reply(f"{title}\n{description}\n\n{touch}\n{cat}\n{nano}\n\n{hashtags}")
+                    
+                case 5:
+                    nano = "📝 <code>/user [изменить/update/nano] [TG-ID]* [админка]* [очки]* [репутация]* [название страны] [флаг] [капитулирован?]**</code> — изменение данных, " \
+                           f"где звёздочка обозначает цифровое значение, а двойная от 0 до 1, что является True и False. {nano_outro}"
+                    await message.reply(f"{title}\n{description}\n\n{touch}\n{cat}\n{nano}\n{rm}\n\n{hashtags}")
+
+                case _:
+                    await message.reply(f"{title}\n{description}\n\n{hashtags}")

@@ -1,20 +1,21 @@
 from config import (
     ID,
     LOG_OTHERS,
-    ID_CRM_OE, ID_CRM_OE_ADMIN, ID_CRM_OE_NONOFFTOP_THREADS,
-    SUPERADMIN
+    ID_CRM_OE, ID_CRM_OE_NONOFFTOP_THREADS#,
+    #SUPERADMIN
 )
 from master.functions import delayMessageDelete
 
 from CRM_OE.database.scheme import readUser, updateReputation
 
 from asyncio import create_task
-from datetime import datetime, timedelta
+from datetime import datetime
 from dataclasses import dataclass
 
 from aiogram import F, Router
 from aiogram.types import Message
 from aiogram.filters import Command
+from aiogram.filters.command import CommandObject
 
 
 rt = Router()
@@ -32,27 +33,47 @@ async def clearOfftop(message: Message):
 
 @rt.message(F.chat.id == ID_CRM_OE, Command("who"))
 @rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == "ты кто")
-async def uniWho(message: Message):
-    if not message.reply_to_message:
-        await message.delete()
-        return
-    
-    target_id = message.reply_to_message.from_user.id
+async def uniWho(message: Message, command: CommandObject):
+    try:
+        if command.args is None:
+            if not message.reply_to_message:
+                await message.delete()
+                return
+            
+            target_id = message.reply_to_message.from_user.id
 
-    if target_id == ID or target_id == message.from_user.id:
-        await message.delete()
-        return
+            if target_id == ID or target_id == message.from_user.id:
+                await message.delete()
+                return
+            
+            target_data = await readUser(target_id)
+
+        elif command.args is not None:
+            args = command.args.split()
+            target_id = int(args[0])
+            
+            if target_id == message.from_user.id:
+                await message.delete()
+                return
+            
+            target_data = await readUser(target_id)
+
+        if target_data:
+            if target_data[4] != "None":
+                countryName = str(target_data[4]).replace("_", " ")
+                countryStatus = "<i>Капитулировал</i> 💀" if target_data[6] == 0 else ""
+                await message.reply(f"Это <b>{target_data[5]} {countryName}</b>.\n{countryStatus}")
+            else:
+                await message.reply("👻 <b>Это не игрок.</b>")
+        else:
+            await message.reply("👻 <b>Это не игрок!</b>")
         
-    target_data = await readUser(target_id)
-
-    if target_data and target_data[4] != "None":
-        if target_data[4] != "None":
-            target_countyName = str(target_data[4]).replace("_", " ")
-            target_countyStatus = "<i>Капитулировал</i> 💀" if target_data[6] == 0 else ""
-            await message.reply(f"Это {target_data[5]} <b>{target_countyName}</b>.\n{target_countyStatus}")
-
-    else:
-        await message.reply("👻 <b>Это не игрок.</b>")
+    except ValueError:
+        await message.reply("❌ <b>Ошибка.</b> Некорректный Телеграм ID.")
+        return
+    except Exception as e:
+        print(f"(XX) CRM_OE/userside.py: uniWho(): {e}.")
+        return
 
 
 '''Система репутации'''
@@ -82,7 +103,7 @@ async def textReputation(message: Message):
     
     target_id = message.reply_to_message.from_user.id
 
-    if user_id == target_id:
+    if target_id == ID or user_id == target_id:
         await message.delete()
         return
     
