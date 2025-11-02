@@ -1,8 +1,8 @@
 from config import (
     ID,
     LOG_OTHERS,
-    ID_CRM_OE, ID_CRM_OE_NONOFFTOP_THREADS#,
-    #SUPERADMIN
+    ID_CRM_OE, ID_CRM_OE_NONOFFTOP_THREADS,
+    PREFIX
 )
 from master.functions import delayMessageDelete
 
@@ -23,7 +23,7 @@ rt = Router()
 
 
 @rt.message(F.chat.id == ID_CRM_OE, F.message_thread_id.in_(ID_CRM_OE_NONOFFTOP_THREADS))
-async def clearOfftop(message: Message):
+async def clearOfftop(message: Message) -> None:
     user = f"@{message.from_user.username}" if message.from_user.username else f"{message.from_user.first_name} ({message.from_user.id})"
 
     if message.text and (message.text.startswith("//") or message.text.startswith("((")):
@@ -32,8 +32,9 @@ async def clearOfftop(message: Message):
         
 
 @rt.message(F.chat.id == ID_CRM_OE, Command("who"))
+@rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == f"{PREFIX}страна")
 @rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == "ты кто")
-async def uniWho(message: Message, command: CommandObject):
+async def uniWho(message: Message, command: CommandObject) -> None:
     try:
         if command.args is None:
             if not message.reply_to_message:
@@ -42,27 +43,22 @@ async def uniWho(message: Message, command: CommandObject):
             
             target_id = message.reply_to_message.from_user.id
 
-            if target_id == ID or target_id == message.from_user.id:
-                await message.delete()
-                return
-            
-            target_data = await readUser(target_id)
-
-        elif command.args is not None:
+        elif command.args is not None: # Поиск по TG-ID.
             args = command.args.split()
             target_id = int(args[0])
             
-            if target_id == message.from_user.id:
-                await message.delete()
-                return
+        if target_id == ID or target_id == message.from_user.id:
+            await message.delete()
+            return
             
-            target_data = await readUser(target_id)
+        target_data = await readUser(target_id)
 
         if target_data:
-            if target_data[4] != "None":
-                countryName = str(target_data[4]).replace("_", " ")
-                countryStatus = "<i>Капитулировал</i> 💀" if target_data[6] == 0 else ""
-                await message.reply(f"Это <b>{target_data[5]} {countryName}</b>.\n{countryStatus}")
+            if target_data[3] != "None":
+                countryName = str(target_data[3]).replace("_", " ")
+                countryStatus = "<i>Капитулировал</i> 💀" if target_data[5] == 0 else ""
+                points = f"⚜️ <b>{target_data[6]}</b> очков влияния." if target_data[5] == 1 else ""
+                await message.reply(f"Это <b>{target_data[4]} {countryName}</b>.\n{countryStatus}{points}")
             else:
                 await message.reply("👻 <b>Это не игрок.</b>")
         else:
@@ -134,5 +130,5 @@ async def textReputation(message: Message):
 
     reputationData[user_id] = ReputationDataclass(
         user_id=user_id,
-        timeout=current_time + 86400 # 24 часа.
+        timeout=current_time + 28800 # 8 часов.
     )

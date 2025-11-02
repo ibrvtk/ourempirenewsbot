@@ -1,4 +1,5 @@
 from config import (
+    BOT,
     TOGGLE_OER, TOGGLE_CRM,
     #ID_OERCHAT_ADMIN,
     ID_CRM_OE_ADMIN,
@@ -70,7 +71,7 @@ async def cmdCancel(message: Message, state: FSMContext) -> None: # Написа
 
 
 @rt.message(Command('help'))
-async def cmd(message: Message, command: CommandObject):
+async def cmd(message: Message, command: CommandObject) -> None:
     if command.args is None:
         await message.reply("Coming soon")
         return
@@ -97,19 +98,34 @@ async def cmd(message: Message, command: CommandObject):
 
             match int(user_data[1]):
                 case 21:
-                    nano = "📝 <code>/user [изменить/update/nano] [TG-ID]* [название_страны] [флаг]</code> — изменение данных, " \
-                           f"где звёздочка обозначает цифровое значение. {nano_outro}"
-                    await message.reply(f"{title}\n{description}\n\n{touch}\n{cat}\n{nano}\n\n{hashtags}")
-
-                case 22:
                     nano = "📝 <code>/user [изменить/update/nano] [TG-ID]* [название_страны] [флаг] [капитулирован?]**</code> — изменение данных, " \
                            f"где звёздочка обозначает цифровое значение, а двойная от 0 до 1, что является True и False. {nano_outro}"
                     await message.reply(f"{title}\n{description}\n\n{touch}\n{cat}\n{nano}\n\n{hashtags}")
+
+                case 22:
+                    nano = "📝 <code>/user [изменить/update/nano] [TG-ID]* [название_страны] [флаг]</code> — изменение данных, " \
+                           f"где звёздочка обозначает цифровое значение. {nano_outro}"
+                    await message.reply(f"{title}\n{description}\n\n{touch}\n{cat}\n{nano}\n\n{hashtags}")
                     
                 case 5:
-                    nano = "📝 <code>/user [изменить/update/nano] [TG-ID]* [админка]* [очки]* [репутация]* [название страны] [флаг] [капитулирован?]**</code> — изменение данных, " \
+                    nano = "📝 <code>/user [изменить/update/nano] [TG-ID]* [админка]* [репутация]* [название страны] [флаг] [капитулирован?]** [влияние]*</code> — изменение данных, " \
                            f"где звёздочка обозначает цифровое значение, а двойная от 0 до 1, что является True и False. {nano_outro}"
                     await message.reply(f"{title}\n{description}\n\n{touch}\n{cat}\n{nano}\n{rm}\n\n{hashtags}")
 
                 case _:
                     await message.reply(f"{title}\n{description}\n\n{hashtags}")
+
+
+@rt.message(Command("id"))
+@rt.message(F.text.lower() == f"{PREFIX}id")
+@rt.message(F.text.lower() == "id")
+@rt.message(F.text.lower() == f"{PREFIX}айди")
+@rt.message(F.text.lower() == "айди")
+@rt.message(F.text.lower() == f"{PREFIX}ид")
+@rt.message(F.text.lower() == "ид")
+async def cmdId(message: Message) -> None:
+    if not message.reply_to_message:
+        await message.reply(f"<code>{message.from_user.id}</code>")
+        return
+    
+    await message.reply(f"<code>{message.reply_to_message.from_user.id}</code>")
