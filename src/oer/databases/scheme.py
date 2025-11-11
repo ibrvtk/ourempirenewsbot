@@ -1,4 +1,8 @@
-from config import LOG_OTHERS, DB_OER_APPEALS_PATH#, DB_OER_USERS_PATH
+from config import (
+    logDatabasesBool,
+    DB_OER_SCHEME_PATH, DB_OER_APPEALS_PATH
+)
+from master.logging import logError, logOther
 
 from aiosqlite import connect
 
@@ -20,11 +24,11 @@ from aiosqlite import connect
 async def createTableAppeals() -> None:
     try:
         async with connect(DB_OER_APPEALS_PATH) as db:
-            with open('src/oerChat/databases/scheme.sql', 'r', encoding='utf-8') as file:
+            with open(DB_OER_SCHEME_PATH, 'r', encoding='utf-8') as file:
                 sql_script = file.read()
             await db.executescript(sql_script)
             await db.commit()
-        print("(V) oerChat/databases/scheme.py: createTableAppeals(): успех.") if LOG_OTHERS else None
+        logOther("(V) oer/databases/scheme.py: createTableAppeals(): успех.") if logDatabasesBool else None
 
     except Exception as e:
-        print(f"(XXX) oerChat/databases/scheme.py: createTableAppeals(): {e}.")
+        logError(f"oer/databases/scheme.py: createTableAppeals(): {e}.")

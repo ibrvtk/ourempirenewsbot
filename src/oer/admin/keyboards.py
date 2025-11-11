@@ -1,14 +1,9 @@
-# import aiosqlite
-
-from aiogram.types import (
-    # ReplyKeyboardMarkup, KeyboardButton,
-    InlineKeyboardMarkup, InlineKeyboardButton
-)
-from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
+from aiogram.types import InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 
-'''V /unban V'''
+'''/unban'''
 def unbanKeyboard_(appeal_id: str):
     keyboard = InlineKeyboardBuilder()
     
@@ -27,4 +22,3 @@ def unbanKeyboardAcceptedActions_(appeal_id: str):
     keyboard.add(InlineKeyboardButton(text="▶️", callback_data=f"unbanAppealMsgHistoryNext_{appeal_id}"))
     
     return keyboard.adjust(2).as_markup()
-'''^ /unban ^'''

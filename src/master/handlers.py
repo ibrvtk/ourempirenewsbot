@@ -1,21 +1,11 @@
 from config import (
-    BOT,
-    TOGGLE_OER, TOGGLE_CRM,
-    #ID_OERCHAT_ADMIN,
     ID_CRM_OE_ADMIN,
-    LOG_ERRORS,# LOG_OTHERS,
-    SUPERADMIN, PREFIX
+    PREFIX, SUPERADMIN
 )
 
-import oerChat.adminside as oerAdminside
-# import oerChat.databases.scheme as oerDB
-# from oerChat.databases.scheduler import schedulerAppealsTimeout
+from oer.admin.master import unbanWriteAppealIdInDB as oerUnbanWriteAppealIdInDB
 
-# import CRM_OE.userside as crmUserside
-# import CRM_OE.adminside as crmAdminside
-import CRM_OE.database.scheme as crmDB
-
-from re import compile
+from crm.database.scheme import readUser as crmReadUser
 
 from aiogram import Router, F
 from aiogram.types import Message, ReplyKeyboardRemove
@@ -28,27 +18,25 @@ rt = Router()
 
 
 
-# Временная команда. Записывает пользователя в БД CRM_OE/database/players.db .
-# Временная, так как БД ещё в разработке.
-# Доступна только Суперадмину, что бы не записывать случайных пользователей.
-# Позже функционал по идее будет перенесён в uniStart() .
-@rt.message(F.user_id == SUPERADMIN, Command('db'))
-async def cmdDb(message: Message) -> None:
-    if TOGGLE_CRM:
-        try:
-            await crmDB.createUser(user_id=message.from_user.id)
-            await message.reply("✅ Успех")
-        except Exception as e:
-            print(f"(XX) main.py: uniStart(): {e}.")
-            return
+@rt.message(F.chat.type == "private", Command("start"))
+async def cmdStart(message: Message, command: CommandObject) -> None:
+    await message.answer(f"")
 
-# @rt.message(Command("start"))
-# async def cmdStart
 
 @rt.message(F.text.lower() == "бот")
 @rt.message(F.text.lower() == f"{PREFIX}бот")
-async def fcmdCheck(message: Message) -> None: # Временное решение. В будущем будет роадмап по командам бота.
+async def fcmdCheck(message: Message) -> None:
     await message.reply("✅ На месте")
+
+
+@rt.message(F.from_user.id == SUPERADMIN, Command("echo"))
+async def cmdEcho(message: Message, command: CommandObject):
+    if command.args is None:
+        await message.delete()
+        return
+    
+    await message.delete()
+    await message.answer(command.args)
 
 
 @rt.message(F.text.lower() == f"{PREFIX}отмена")
@@ -56,22 +44,16 @@ async def fcmdCheck(message: Message) -> None: # Временное решени
 async def cmdCancel(message: Message, state: FSMContext) -> None: # Написано убого. Временное решение.
     user_id = message.from_user.id
 
-    try:
-        await oerAdminside.unbanWriteAppealIdInDB(user_id, state)
-        await state.clear()
-        await message.answer("✅ <b>Текущая операция отменена.</b>",
-                                reply_markup=ReplyKeyboardRemove())
-        
-    except Exception as e:
-        if int(e) == user_id:
-            print(f"(X) master/handlers: cmdCancel(): У {user_id} нечего отменять.") if LOG_ERRORS else None
-        else:
-            print(f"(XX) master/handlers: cmdCancel(): {e}.")
-        return
+    try: await oerUnbanWriteAppealIdInDB(appellant_id=user_id, state=state)
+    except: pass
+    try: await state.clear()
+    except: pass
+    await message.answer("✅ <b>Текущая операция отменена.</b>",
+                            reply_markup=ReplyKeyboardRemove())
 
 
 @rt.message(Command('help'))
-async def cmd(message: Message, command: CommandObject) -> None:
+async def cmdHelp(message: Message, command: CommandObject) -> None:
     if command.args is None:
         await message.reply("Coming soon")
         return
@@ -81,7 +63,7 @@ async def cmd(message: Message, command: CommandObject) -> None:
     user_id = message.from_user.id
 
     if message.chat.id == ID_CRM_OE_ADMIN:
-        user_data = await crmDB.readUser(user_id)
+        user_data = await crmReadUser(user_id)
         if not user_data: return
 
         if args[0] == "user":

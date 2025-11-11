@@ -1,9 +1,9 @@
 from config import (
-    BOT,
-    LOG_OTHERS
+    bot
 )
+from master.logging import logError, logOther
 
-from oerChat.databases.appeals import updateUser, getTimeouts
+from oer.databases.appeals import updateUser, getTimeouts
 
 from asyncio import sleep
 
@@ -19,14 +19,17 @@ async def schedulerAppealsTimeout():
                 
                 await updateUser(appellant_id, timeout=0)
                 
-                await BOT.send_message(
+                await bot.send_message(
                     chat_id=appellant_id,
                     text="📳 <b>Таймаут окончен!</b>"
                 )
                 
-                print(f"(V) oerChat/databases/scheduler.py: Таймаут для {appellant_id} сброшен.") if LOG_OTHERS else None
+                logOther(f"(V) oer/databases/scheduler.py: Таймаут для {appellant_id} сброшен.")
                 
         except Exception as e:
-            print(f"(XX) oerChat/databases/scheduler.py: {e}.")
+            if "database is locked" in str(e):
+                await logError("oer/databases/appeals.py: schedulerAppealsTimeout(): База данных недоступна.", True)
+            else:
+                await logError(f"oer/databases/appeals.py: schedulerAppealsTimeout(): {e}.", True)
         
         await sleep(30)  # 30 секунд.

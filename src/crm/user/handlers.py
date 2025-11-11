@@ -1,12 +1,11 @@
 from config import (
     ID,
-    LOG_OTHERS,
-    ID_CRM_OE, ID_CRM_OE_NONOFFTOP_THREADS,
-    PREFIX
+    ID_CRM_OE, ID_CRM_OE_NONOFFTOP_THREADS
 )
 from master.functions import delayMessageDelete
+from master.logging import logOther
 
-from CRM_OE.database.scheme import readUser, updateReputation
+from crm.database.scheme import readUser, updateReputation
 
 from asyncio import create_task
 from datetime import datetime
@@ -22,54 +21,42 @@ rt = Router()
 
 
 
-@rt.message(F.chat.id == ID_CRM_OE, F.message_thread_id.in_(ID_CRM_OE_NONOFFTOP_THREADS))
-async def clearOfftop(message: Message) -> None:
-    user = f"@{message.from_user.username}" if message.from_user.username else f"{message.from_user.first_name} ({message.from_user.id})"
-
-    if message.text and (message.text.startswith("//") or message.text.startswith("((")):
-        create_task(delayMessageDelete(message, 600))
-        print(f"(+) @CRM_OE: {message.message_thread_id}: Создан таймер на удаление оффтопа ({user}).") if LOG_OTHERS else None
-        
-
 @rt.message(F.chat.id == ID_CRM_OE, Command("who"))
-@rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == f"{PREFIX}страна")
+@rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == "страна")
 @rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == "ты кто")
 async def uniWho(message: Message, command: CommandObject) -> None:
-    try:
-        if command.args is None:
-            if not message.reply_to_message:
-                await message.delete()
-                return
-            
-            target_id = message.reply_to_message.from_user.id
-
-        elif command.args is not None: # Поиск по TG-ID.
-            args = command.args.split()
-            target_id = int(args[0])
-            
-        if target_id == ID or target_id == message.from_user.id:
+    '''Идентефикация страны человека'''
+    if command.args is None:
+        if not message.reply_to_message:
             await message.delete()
             return
-            
-        target_data = await readUser(target_id)
-
-        if target_data:
-            if target_data[3] != "None":
-                countryName = str(target_data[3]).replace("_", " ")
-                countryStatus = "<i>Капитулировал</i> 💀" if target_data[5] == 0 else ""
-                points = f"⚜️ <b>{target_data[6]}</b> очков влияния." if target_data[5] == 1 else ""
-                await message.reply(f"Это <b>{target_data[4]} {countryName}</b>.\n{countryStatus}{points}")
-            else:
-                await message.reply("👻 <b>Это не игрок.</b>")
-        else:
-            await message.reply("👻 <b>Это не игрок!</b>")
         
-    except ValueError:
-        await message.reply("❌ <b>Ошибка.</b> Некорректный Телеграм ID.")
+        target_id = message.reply_to_message.from_user.id
+
+    elif command.args is not None: # Поиск по TG-ID.
+        try:
+            args = command.args.split()
+            target_id = int(args[0])
+        except ValueError:
+            await message.delete()
+            return
+        
+    if target_id == ID or target_id == message.from_user.id:
+        await message.delete()
         return
-    except Exception as e:
-        print(f"(XX) CRM_OE/userside.py: uniWho(): {e}.")
-        return
+        
+    target_data = await readUser(target_id)
+
+    if target_data:
+        if target_data[3] != "None":
+            countryName = str(target_data[3]).replace("_", " ")
+            countryStatus = "<i>Капитулировал</i> 💀" if target_data[5] == 0 else ""
+            points = f"⚜️ <b>{target_data[6]}</b> очков влияния." if target_data[5] == 1 else ""
+            await message.reply(f"Это <b>{target_data[4]} {countryName}</b>.\n{countryStatus}{points}")
+        else:
+            await message.reply("👻 <b>Это не игрок.</b>")
+    else:
+        await message.reply("👻 <b>Это не игрок!</b>")
 
 
 '''Система репутации'''
@@ -84,7 +71,7 @@ reputationData = {}
 @rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == "+реп")
 @rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == "-rep")
 @rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == "-реп")
-async def textReputation(message: Message):
+async def textReputation(message: Message) -> None:
     global reputationData
     user_id = message.from_user.id
     current_time = datetime.now().timestamp()
@@ -132,3 +119,13 @@ async def textReputation(message: Message):
         user_id=user_id,
         timeout=current_time + 28800 # 8 часов.
     )
+
+
+'''Удаление оффтопа'''
+@rt.message(F.chat.id == ID_CRM_OE, F.message_thread_id.in_(ID_CRM_OE_NONOFFTOP_THREADS))
+async def clearOfftop(message: Message) -> None:
+    user_user = f"@{message.from_user.username}" if message.from_user.username else f"{message.from_user.first_name} ({message.from_user.id})"
+
+    if message.text and (message.text.startswith("//") or message.text.startswith("((")):
+        create_task(delayMessageDelete(message, 600, True))
+        await logOther(f"(+) crm/admin/user: @CRM_OE — /{message.message_thread_id}: Создан таймер на удаление оффтопа ({user_user}).")
