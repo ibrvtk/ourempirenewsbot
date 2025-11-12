@@ -20,17 +20,17 @@ async def createUser(appellant_id: int, appeal_ids: str = "None", timeout: int =
             changes = cursor.rowcount
         
             if changes > 0:
-                await logOther("(V) oer/databases/appeals.py: createUser(): Успех.") if logDatabasesBool else None
+                await logOther("(V) oer/database/appeals.py: createUser(): Успех.") if logDatabasesBool else None
                 return cursor.lastrowid
             else:
-                await logOther(f"(i) oer/databases/appeals.py: createUser(): @{appellant_id} уже существует.") if logDatabasesBool else None
+                await logOther(f"(i) oer/database/appeals.py: createUser(): @{appellant_id} уже существует.") if logDatabasesBool else None
                 return None
 
     except Exception as e:
         if "database is locked" in str(e):
-            await logError("oer/databases/appeals.py: createUser(): База данных недоступна.", True)
+            await logError("oer/database/appeals.py: createUser(): База данных недоступна.", True)
         else:
-            await logError(f"oer/databases/appeals.py: createUser(): {e}.", True)
+            await logError(f"oer/database/appeals.py: createUser(): {e}.", True)
 
 
 async def readUser(appellant_id: int):
@@ -38,14 +38,14 @@ async def readUser(appellant_id: int):
         async with connect(DB_OER_APPEALS_PATH) as db:
             async with db.execute("SELECT * FROM appeals WHERE appellant_id = ?", (appellant_id,)) as cursor:
                 user_data = await cursor.fetchone()
-                await logOther("(V) oer/databases/appeals.py: readUser(): Успех.") if logDatabasesBool else None
+                await logOther("(V) oer/database/appeals.py: readUser(): Успех.") if logDatabasesBool else None
                 return user_data
             
     except Exception as e:
         if "database is locked" in str(e):
-            await logError("oer/databases/appeals.py: readUser(): База данных недоступна.", True)
+            await logError("oer/database/appeals.py: readUser(): База данных недоступна.", True)
         else:
-            await logError(f"oer/databases/appeals.py: readUser(): {e}.", True)
+            await logError(f"oer/database/appeals.py: readUser(): {e}.", True)
         return None
     
 
@@ -58,13 +58,13 @@ async def updateUser(appellant_id: int, **kwargs) -> None:
             
             await db.execute(f"UPDATE appeals SET {setClause} WHERE appellant_id = ?", values)
             await db.commit()
-            logOther("(V) oer/databases/appeals.py: updateUser(): Успех.") if logDatabasesBool else None
+            logOther("(V) oer/database/appeals.py: updateUser(): Успех.") if logDatabasesBool else None
 
     except Exception as e:
         if "database is locked" in str(e):
-            await logError("oer/databases/appeals.py: updateUser(): База данных недоступна.", True)
+            await logError("oer/database/appeals.py: updateUser(): База данных недоступна.", True)
         else:
-            await logError(f"oer/databases/appeals.py: updateUser(): {e}.", True)
+            await logError(f"oer/database/appeals.py: updateUser(): {e}.", True)
     
 
 async def deleteUser(appellant_id: int) -> None:
@@ -72,13 +72,13 @@ async def deleteUser(appellant_id: int) -> None:
         async with connect(DB_OER_APPEALS_PATH) as db:
             await db.execute("DELETE FROM appeals WHERE appellant_id = ?", (appellant_id,))
             await db.commit()
-            print("(V) oerChat/databases/appeals.py: deleteUser(): Успех.") if logDatabasesBool else None
+            print("(V) oer/database/appeals.py: deleteUser(): Успех.") if logDatabasesBool else None
 
     except Exception as e:
         if "database is locked" in str(e):
-            await logError("oer/databases/appeals.py: deleteUser(): База данных недоступна.", True)
+            await logError("oer/database/appeals.py: deleteUser(): База данных недоступна.", True)
         else:
-            await logError(f"oer/databases/appeals.py: deleteUser(): {e}.", True)
+            await logError(f"oer/database/appeals.py: deleteUser(): {e}.", True)
 
 
 async def getTimeouts():
@@ -93,7 +93,7 @@ async def getTimeouts():
             
     except Exception as e:
         if "database is locked" in str(e):
-            await logError("oer/databases/appeals.py: getTimeouts(): База данных недоступна.", True)
+            await logError("oer/database/appeals.py: getTimeouts(): База данных недоступна.", True)
         else:
-            await logError(f"oer/databases/appeals.py: getTimeouts(): {e}.", True)
+            await logError(f"oer/database/appeals.py: getTimeouts(): {e}.", True)
         return []

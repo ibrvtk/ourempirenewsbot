@@ -1,5 +1,5 @@
-from dotenv import load_dotenv; load_dotenv()
 from os import getenv
+from dotenv import load_dotenv; load_dotenv()
 
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties

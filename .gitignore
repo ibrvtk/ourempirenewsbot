@@ -3,7 +3,7 @@
 
 src/master/callbacks.py
 src/master/keyboards.py
-src/oer/databases/users.py
+src/oer/database/users.py
 
 .venv
 .env

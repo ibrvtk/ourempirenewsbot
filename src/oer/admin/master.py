@@ -4,7 +4,7 @@ from config import (
     ID_OERCHAT_ADMIN
 )
 
-from oer.databases.appeals import readUser, updateUser
+from oer.database.appeals import readUser, updateUser
 
 from asyncio import sleep
 from dataclasses import dataclass

@@ -3,7 +3,7 @@ from config import (
 )
 from master.logging import logError, logOther
 
-from oer.databases.appeals import updateUser, getTimeouts
+from oer.database.appeals import updateUser, getTimeouts
 
 from asyncio import sleep
 
@@ -24,12 +24,12 @@ async def schedulerAppealsTimeout():
                     text="📳 <b>Таймаут окончен!</b>"
                 )
                 
-                logOther(f"(V) oer/databases/scheduler.py: Таймаут для {appellant_id} сброшен.")
+                logOther(f"(V) oer/database/scheduler.py: Таймаут для {appellant_id} сброшен.")
                 
         except Exception as e:
             if "database is locked" in str(e):
-                await logError("oer/databases/appeals.py: schedulerAppealsTimeout(): База данных недоступна.", True)
+                await logError("oer/database/appeals.py: schedulerAppealsTimeout(): База данных недоступна.", True)
             else:
-                await logError(f"oer/databases/appeals.py: schedulerAppealsTimeout(): {e}.", True)
+                await logError(f"oer/database/appeals.py: schedulerAppealsTimeout(): {e}.", True)
         
         await sleep(30)  # 30 секунд.

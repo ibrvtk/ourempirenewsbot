@@ -12,7 +12,7 @@ from oer.admin.master import (
     unbanAppealStatusCheck, unbanNoMessageTimeout, unbanWriteAppealIdInDB
 )
 from oer.admin.keyboards import unbanKeyboard_, unbanKeyboardAcceptedActions_
-from oer.databases.appeals import createUser, readUser
+from oer.database.appeals import createUser, readUser
 
 from datetime import datetime
 

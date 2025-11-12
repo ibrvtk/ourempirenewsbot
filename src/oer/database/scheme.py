@@ -28,7 +28,7 @@ async def createTableAppeals() -> None:
                 sql_script = file.read()
             await db.executescript(sql_script)
             await db.commit()
-        logOther("(V) oer/databases/scheme.py: createTableAppeals(): успех.") if logDatabasesBool else None
+        logOther("(V) oer/database/scheme.py: createTableAppeals(): успех.") if logDatabasesBool else None
 
     except Exception as e:
-        logError(f"oer/databases/scheme.py: createTableAppeals(): {e}.")
+        logError(f"oer/database/scheme.py: createTableAppeals(): {e}.")
