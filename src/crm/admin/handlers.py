@@ -274,18 +274,23 @@ async def fcmdCountriesList(message: Message) -> None:
 async def clearMessageFromNotPlayer(message: Message) -> None:
     '''Удаление сообщений от не игроков в топиках [И] (для игроков).'''
     try:
-        users_data = await readUsers()
-        player_ids = [user[0] for user in users_data]
-        
-        if message.from_user.id not in player_ids:
+        user_data = await readUser(message.from_user.id)
+        if user_data[3] == "None" and user_data[1] == 0:
             await message.delete()
             return
+
+        # users_data = await readUsers()
+        # player_ids = [user[0] for user in users_data]
         
-        for user_id, countryName, countryFlag, countryStatus, adminLevel in users_data:
-            if user_id == message.from_user.id and countryName == "None" and adminLevel == 0:
-                await message.delete()
-                await logOther(f"(V) crm/admin/handlers.py: clearMessageFromNotPlayer(): Успех — Удалено сообщение от не игрока.")
-                break
+        # if message.from_user.id not in player_ids:
+        #     await message.delete()
+        #     return
+        
+        # for user_id, countryName, countryFlag, countryStatus, adminLevel in users_data:
+        #     if user_id == message.from_user.id and countryName == "None" and adminLevel == 0:
+        #         await message.delete()
+        #         await logOther(f"(V) crm/admin/handlers.py: clearMessageFromNotPlayer(): Успех — Удалено сообщение от не игрока.")
+        #         break
     
     except Exception as e:
         if "message can't be deleted" in str(e):

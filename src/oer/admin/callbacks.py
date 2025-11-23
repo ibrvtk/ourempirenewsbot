@@ -74,7 +74,7 @@ async def unbanCbAppealAccept(callback: CallbackQuery, state: FSMContext) -> Non
             await answerRawError(message=callback.message, e=e)
             await logError(f"oer/admin/callbacks`.py: unbanCbAppealAccept(): {callback.from_user.id} & {appellant_id} — {e}.")
 
-    # Дискуссия продолжается в `unbanAppellantMessage`: `match appellant_message_count`: `case _`.
+    # Дискуссия продолжается в handlers: unbanAppellantMessage(): match appellant_message_count: case _.
 
 # Апелляция отклонена.
 @rt.callback_query(F.data.startswith("unbanAppealDecline_"))

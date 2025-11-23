@@ -167,8 +167,8 @@ async def deleteUser(user_id: int) -> None:
         async with connect(DB_CRM_PLAYERS_PATH) as db:
             await db.execute("DELETE FROM players WHERE user_id = ?", (user_id,))
             await db.commit()
-            logOther("(V) crm/database/scheme.py: deleteUser(): Успех.") if logDatabasesBool else None
+            await logOther("(V) crm/database/scheme.py: deleteUser(): Успех.") if logDatabasesBool else None
 
     except Exception as e:
-        logError(f"crm/database/scheme.py: deleteUser(): {e}.", True)
+        await logError(f"crm/database/scheme.py: deleteUser(): {e}.", True)
         return

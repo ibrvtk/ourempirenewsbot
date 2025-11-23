@@ -68,7 +68,7 @@ async def answerRawError(message: Message, e: Exception, e_fastcode: str = "", t
         chat_id=ID_OERCHAT_ADMIN,
         message_thread_id=ID_OERCHAT_ADMIN_TERMINAL_THREAD,
         text=f"❌ <b>Ошибка</b>\n"
-                f"<b>В чате:</b> @{chat_name}\n"
+                f"<b>В чате:</b> {chat_name}\n"
                 f"<b>От:</b> {user_user}\n"
                 f"<b>Триггер:</b> <code>{message.text}</code>\n"
                 f"<blockquote>{e_fastcode}{error}</blockquote>"

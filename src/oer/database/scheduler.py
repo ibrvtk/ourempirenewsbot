@@ -24,7 +24,7 @@ async def schedulerAppealsTimeout():
                     text="📳 <b>Таймаут окончен!</b>"
                 )
                 
-                logOther(f"(V) oer/database/scheduler.py: Таймаут для {appellant_id} сброшен.")
+                await logOther(f"(V) oer/database/scheduler.py: Таймаут для {appellant_id} сброшен.")
                 
         except Exception as e:
             if "database is locked" in str(e):

@@ -58,7 +58,7 @@ async def updateUser(appellant_id: int, **kwargs) -> None:
             
             await db.execute(f"UPDATE appeals SET {setClause} WHERE appellant_id = ?", values)
             await db.commit()
-            logOther("(V) oer/database/appeals.py: updateUser(): Успех.") if logDatabasesBool else None
+            await logOther("(V) oer/database/appeals.py: updateUser(): Успех.") if logDatabasesBool else None
 
     except Exception as e:
         if "database is locked" in str(e):

@@ -18,9 +18,12 @@ rt = Router()
 
 
 
-@rt.message(F.chat.type == "private", Command("start"))
-async def cmdStart(message: Message, command: CommandObject) -> None:
-    await message.answer(f"")
+# @rt.message(F.chat.type == "private", Command("start"))
+# async def cmdStart(message: Message, command: CommandObject) -> None:
+#     await message.answer(f"")
+
+# @rt.message(F.chat.type == "private", Command('developer_info'))
+# async def cmdDeveloperInfo(message: Message):
 
 
 @rt.message(F.text.lower() == "бот")
@@ -29,7 +32,7 @@ async def fcmdCheck(message: Message) -> None:
     await message.reply("✅ На месте")
 
 
-@rt.message(F.from_user.id == SUPERADMIN, Command("echo"))
+@rt.message(F.from_user.id.in_(SUPERADMIN), Command("echo"))
 async def cmdEcho(message: Message, command: CommandObject):
     if command.args is None:
         await message.delete()
@@ -111,3 +114,8 @@ async def cmdId(message: Message) -> None:
         return
     
     await message.reply(f"<code>{message.reply_to_message.from_user.id}</code>")
+
+
+@rt.message(F.from_user.id.in_(SUPERADMIN), F.text.lower() == f"{PREFIX}суперадмины")
+async def fcmdSuperadmins(message: Message):
+    await message.reply(f"{SUPERADMIN}")

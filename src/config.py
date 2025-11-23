@@ -13,26 +13,43 @@ PREFIX = getenv('PREFIX')
 
 
 
-'''Логгирование в терминале'''
-LOG_ERRORS_RAW = getenv('LOG_ERRORS'); logErrorsBool = False
-if LOG_ERRORS_RAW == "True": logErrorsBool = True
-LOG_OTHERS_RAW = getenv('LOG_OTHERS'); logOthersBool = False
-if LOG_OTHERS_RAW == "True": logOthersBool = True
-LOG_DATABASES_RAW = getenv('LOG_DATABASES'); logDatabasesBool = False
-if LOG_DATABASES_RAW == "True": logDatabasesBool = True
+# Логгирование в терминале
+LOG_ERRORS_RAW = getenv('LOG_ERRORS') # Логгирование предусмотренных ошибок.
+logErrorsBool = False
+if LOG_ERRORS_RAW == "True":
+    logErrorsBool = True
 
-'''ВКЛ/ВЫКЛ работу бота в определённых чатах'''
-TOGGLE_OER_RAW = getenv('TOGGLE_OER'); TOGGLE_OER = False
-if TOGGLE_OER_RAW == "True": TOGGLE_OER = True # @oerChat (oerChat/*)
-TOGGLE_CRM_RAW = getenv('TOGGLE_CRM'); TOGGLE_CRM = False
-if TOGGLE_CRM_RAW == "True": TOGGLE_CRM = True # @CRM_OE (CRM_OE/*)
+LOG_OTHERS_RAW = getenv('LOG_OTHERS') # Логгирование удачных операций, информационных сообщений, уведомлений о создании новых процессов.
+logOthersBool = False
+if LOG_OTHERS_RAW == "True":
+    logOthersBool = True
+
+LOG_DATABASES_RAW = getenv('LOG_DATABASES') # Логгирование сообщений от баз данных (ошибки логгируются принудительно).
+logDatabasesBool = False
+if LOG_DATABASES_RAW == "True":
+    logDatabasesBool = True
+
+# ВКЛ/ВЫКЛ работу бота в определённых чатах
+TOGGLE_OER_RAW = getenv('TOGGLE_OER') # @oerChat (oer/*)
+TOGGLE_OER = False
+if TOGGLE_OER_RAW == "True":
+    TOGGLE_OER = True
+
+TOGGLE_CRM_RAW = getenv('TOGGLE_CRM') # @CRM_OE (crm/*)
+TOGGLE_CRM = False
+if TOGGLE_CRM_RAW == "True":
+    TOGGLE_CRM = True
 
 
 # Суперадмин может без прав в боте (БД) управлять им в любом месте.
-SUPERADMIN = int(getenv('SUPERADMIN'))
+#SUPERADMIN = [int(getenv('SUPERADMIN'))]
 # Если нужен список суперадминов закомментировать строку выше и раскомментировать две ниже:
-# SUPERADMIN_RAW = getenv('SUPERADMIN_ARRAY')
-# SUPERADMIN = [int(admin_id.strip()) for admin_id in SUPERADMIN_ARRAY.split(',')]
+SUPERADMIN_RAW = getenv('SUPERADMIN_ARRAY')
+SUPERADMIN = []
+for admin_id in SUPERADMIN_RAW.split(","):
+    SUPERADMIN.append(int(admin_id))
+# for admin_id in SUPERADMIN_RAW.split():
+# SUPERADMIN = [int(admin_id.strip()) for admin_id in SUPERADMIN_RAW.split(',')]
 
 
 '''TG-ID чатов, в которых бот работает'''

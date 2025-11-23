@@ -177,7 +177,7 @@ async def unbanAdminMessage(message: Message, state: FSMContext) -> None:
 
 
 # Люто очистить всю память appealData и messagesData .
-@rt.message(F.chat.id == ID_OERCHAT_ADMIN, F.from_user.id == SUPERADMIN, F.text.lower() == f"{PREFIX}очистить апелляции")
+@rt.message(F.chat.id == ID_OERCHAT_ADMIN, F.from_user.id.in_(SUPERADMIN), F.text.lower() == f"{PREFIX}очистить апелляции")
 async def unbanClearData(message: Message) -> None:
     if message.message_thread_id != ID_OERCHAT_ADMIN_BOT_THREAD:
         await message.reply("Эту команду можно вводить только в топике с <a href='https://t.me/c/2062958469/65368'>жалобами</a>.")
