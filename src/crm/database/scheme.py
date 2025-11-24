@@ -8,9 +8,9 @@ from aiosqlite import connect
 
 
 
-'''C'''
+# C
 async def createTable() -> None:
-    '''Создание таблицы.'''
+    '''Создание таблицы players БД ЦРМ.'''
     try:
         async with connect(DB_CRM_PLAYERS_PATH) as db:
             with open(DB_CRM_SCHEME_PATH, 'r', encoding='utf-8') as file:
@@ -40,7 +40,7 @@ async def createUser(user_id: int) -> None:
         await logError(f"crm/database/scheme.py: createUser(): {e}.", True)
         return
 
-'''R'''
+# R
 async def readUser(user_id: int):
     '''
     Чтение всех данных человека.
@@ -74,11 +74,11 @@ async def readUsers():
         return None
 
 
-'''U'''
+# U
 async def updateUserFull(user_id: int, adminLevel: int = 0, reputation: int = 0,
                      countryName: str = "None", countryFlag: str = "🏴", countryStatus: int = 0, points: int = 0,
                      turnText: str = "None", turnMediafiles: str = "None", turnIsSended: int = 0) -> None:
-    '''Обновление всех данных.'''
+    '''Обновление всех параметров пользователя.'''
     try:
         async with connect(DB_CRM_PLAYERS_PATH) as db:
             await db.execute("""
@@ -96,7 +96,7 @@ async def updateUserFull(user_id: int, adminLevel: int = 0, reputation: int = 0,
 
 async def updateUser5(user_id: int, adminLevel: int = 0, reputation: int = 0,
                      countryName: str = "None", countryFlag: str = "🏴", countryStatus: int = 0, points: int = 0) -> None:
-    '''Обновление всех данных, кроме текста и медиафайлов хода и его статус отправки.'''
+    '''Обновление всех параметров пользователя, кроме текста и медиафайлов хода и его статус отправки.'''
     try:
         async with connect(DB_CRM_PLAYERS_PATH) as db:
             await db.execute("""
@@ -112,7 +112,7 @@ async def updateUser5(user_id: int, adminLevel: int = 0, reputation: int = 0,
         return
     
 async def updateUser2(user_id: int, countryName: str = "None", countryFlag: str = "🏴", countryStatus: int = 0) -> None:
-    '''Обновление названия, флага и статуса капитуляции у страны человека.'''
+    '''Обновление параметров пользователя название, флаг и статус капитуляции.'''
     try:
         async with connect(DB_CRM_PLAYERS_PATH) as db:
             await db.execute("""
@@ -128,7 +128,7 @@ async def updateUser2(user_id: int, countryName: str = "None", countryFlag: str 
         return
 
 async def updateReputation(user_id: int, reputation: int) -> None:
-    '''Обновление репутации.'''
+    '''Обновление параметра репутации человека.'''
     try:
         async with connect(DB_CRM_PLAYERS_PATH) as db:
             await db.execute("""
@@ -144,7 +144,7 @@ async def updateReputation(user_id: int, reputation: int) -> None:
         return
     
 async def updatePoints(user_id: int, points: int) -> None:
-    '''Обновление очков влияния.'''
+    '''Обновление параметров очков влияния у человека.'''
     try:
         async with connect(DB_CRM_PLAYERS_PATH) as db:
             await db.execute("""
@@ -160,7 +160,7 @@ async def updatePoints(user_id: int, points: int) -> None:
         return
 
 
-'''D'''
+# D
 async def deleteUser(user_id: int) -> None:
     '''Удаление человека из таблицы.'''
     try:

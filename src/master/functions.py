@@ -5,10 +5,7 @@ from config import (
 )
 from master.logging import logError, logOther
 
-from asyncio import sleep
-
 from aiogram.types import Message
-# from aiogram.exceptions import TelegramBadRequest
 
 
 
@@ -36,6 +33,7 @@ async def answerRawError(message: Message, e: Exception, e_fastcode: str = "", t
     e_factcode — краткое содержание ошибки, по которому её можно быстро идентефицировать.
     tgTerminal — не выводить ошибку пользователю? Обычно использую если ошибка может вывестись, хотя вызывалась не команда (например в crm/admin/handlers.py: clearMessageFromNotPlayer()).
     '''
+    # from aiogram.exceptions import TelegramBadRequest
     error = str(e)
     
     if not tgTerminal:
@@ -82,6 +80,7 @@ async def delayMessageDelete(message: Message, delay: int, isOfftop: bool = Fals
     delay — задержка, с которой нужно удалить message.
     isOfftop — является ли message оффтопом (нужно лишь для уточнения в терминале).
     '''
+    from asyncio import sleep
     await sleep(delay)
 
     user_id = message.from_user.id

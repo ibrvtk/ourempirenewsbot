@@ -11,6 +11,8 @@ ID = int(getenv('ID'))
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode='HTML'))
 PREFIX = getenv('PREFIX')
 
+DEVELOPER = getenv('DEVELOPER')
+
 
 
 # Логгирование в терминале
@@ -29,6 +31,7 @@ logDatabasesBool = False
 if LOG_DATABASES_RAW == "True":
     logDatabasesBool = True
 
+
 # ВКЛ/ВЫКЛ работу бота в определённых чатах
 TOGGLE_OER_RAW = getenv('TOGGLE_OER') # @oerChat (oer/*)
 TOGGLE_OER = False
@@ -41,35 +44,40 @@ if TOGGLE_CRM_RAW == "True":
     TOGGLE_CRM = True
 
 
-# Суперадмин может без прав в боте (БД) управлять им в любом месте.
-#SUPERADMIN = [int(getenv('SUPERADMIN'))]
-# Если нужен список суперадминов закомментировать строку выше и раскомментировать две ниже:
-SUPERADMIN_RAW = getenv('SUPERADMIN_ARRAY')
-SUPERADMIN = []
-for admin_id in SUPERADMIN_RAW.split(","):
-    SUPERADMIN.append(int(admin_id))
-# for admin_id in SUPERADMIN_RAW.split():
-# SUPERADMIN = [int(admin_id.strip()) for admin_id in SUPERADMIN_RAW.split(',')]
+# Суперадмин может без прав в боте (БД) управлять им в любом месте, а также вводить особые команды.
+SUPERADMINS_RAW = getenv('SUPERADMINS')
+SUPERADMINS = []
+for admin_id in SUPERADMINS_RAW.split(","):
+    SUPERADMINS.append(int(admin_id))
 
 
-'''TG-ID чатов, в которых бот работает'''
+# TG-ID чатов, в которых бот производить работу.
 # Команды, вводимые только в админ чате (*ADMIN*), выполняются без проверки на наличие роли админа,
 # так что будьте осторожнее с тем, кого Вы добавляте в чат админов.
+# @oerChat
 ID_OERCHAT = int(getenv('ID_OERCHAT'))
 ID_OERCHAT_ADMIN = int(getenv('ID_OERCHAT_ADMIN'))
 ID_OERCHAT_ADMIN_BOT_THREAD = int(getenv('ID_OERCHAT_ADMIN_BOT_THREAD'))
 ID_OERCHAT_ADMIN_TERMINAL_THREAD = int(getenv('ID_OERCHAT_ADMIN_TERMINAL_THREAD'))
 
+# @CRM_OE
 ID_CRM_OE = int(getenv('ID_CRM_OE'))
 ID_CRM_OE_ADMIN = int(getenv('ID_CRM_OE_ADMIN'))
 ID_CRM_OE_ADMIN_BOT_THREAD = int(getenv('ID_CRM_OE_ADMIN_BOT_THREAD'))
 ID_CRM_OE_COUNTRIES_THREAD = int(getenv('ID_CRM_OE_COUNTRIES_THREAD'))
-ID_CRM_OE_NONOFFTOP_THREADS_RAW = getenv('ID_CRM_OE_NONOFFTOP_THREADS')
-ID_CRM_OE_NONOFFTOP_THREADS = [int(thread_id.strip()) for thread_id in ID_CRM_OE_NONOFFTOP_THREADS_RAW.split(',')]
-ID_CRM_OE_ONLYPLAYERS_THREADS = getenv('ID_CRM_OE_ONLYPLAYERS_THREADS')
-ID_CRM_OE_ONLYPLAYERS_THREADS = [int(thread_id.strip()) for thread_id in ID_CRM_OE_ONLYPLAYERS_THREADS.split(',')]
 
-'''Пути к базам данных'''
+ID_CRM_OE_NONOFFTOP_THREADS_RAW = getenv('ID_CRM_OE_NONOFFTOP_THREADS')
+ID_CRM_OE_NONOFFTOP_THREADS = []
+for thread_id in ID_CRM_OE_NONOFFTOP_THREADS_RAW.split(","):
+    ID_CRM_OE_NONOFFTOP_THREADS.append(int(thread_id))
+
+ID_CRM_OE_ONLYPLAYERS_THREADS_RAW = getenv('ID_CRM_OE_ONLYPLAYERS_THREADS')
+ID_CRM_OE_ONLYPLAYERS_THREADS = []
+for thread_id in ID_CRM_OE_ONLYPLAYERS_THREADS_RAW.split(","):
+    ID_CRM_OE_ONLYPLAYERS_THREADS.append(int(thread_id))
+
+
+# Пути к базам данных
 DB_OER_SCHEME_PATH = getenv('DB_OER_SCHEME_PATH')
 DB_OER_USERS_PATH = getenv('DB_OER_USERS_PATH')
 DB_OER_APPEALS_PATH = getenv('DB_OER_APPEALS_PATH')

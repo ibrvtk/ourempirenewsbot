@@ -1,7 +1,7 @@
 from config import (
     bot,
     ID_OERCHAT_ADMIN, ID_OERCHAT_ADMIN_BOT_THREAD,
-    PREFIX, SUPERADMIN
+    PREFIX, SUPERADMINS
 )
 from master.functions import answerRawError
 from master.logging import logError, logOther
@@ -27,11 +27,11 @@ rt = Router()
 
 
 
-'''/unban'''
-# appellant — подающий апелляцию, admin — принимающий.
+# /unban
 @rt.message(F.chat.type == "private", Command("unban"))
 @rt.message(F.chat.type == "private", F.text.lower() == f"{PREFIX}апелляция")
 async def unbanUni(message: Message, state: FSMContext) -> None:
+    '''Непосредственный ввод команды /unban.'''
     global appealData
     global messagesData
     appellant_id = message.from_user.id
@@ -79,9 +79,9 @@ async def unbanUni(message: Message, state: FSMContext) -> None:
     await unbanNoMessageTimeout(appellant_id, state)
 
 
-# Апеллянт отправил сообщение.
 @rt.message(FSMunban.text)
 async def unbanAppellantMessage(message: Message, state: FSMContext) -> None: # Приём сообщений от апеллянта.
+    '''Апеллянт отправил сообщение.'''
     appellant_id = message.from_user.id
 
     appeal_active = await unbanAppealStatusCheck(appellant_id)
@@ -117,7 +117,7 @@ async def unbanAppellantMessage(message: Message, state: FSMContext) -> None: # 
                 message_thread_id=ID_OERCHAT_ADMIN_BOT_THREAD,
                 text=f"🆘 <b>Новая апелляция</b> — {appellant_user}\n"
                      f"<blockquote>{message.text}</blockquote>",
-                    reply_markup=unbanKeyboard_(appeal_id)
+                    reply_markup=await unbanKeyboard_(appeal_id)
             )
             appealData[appellant_id].toAdmin_message_id = toAdmin_message.message_id
 
@@ -134,7 +134,7 @@ async def unbanAppellantMessage(message: Message, state: FSMContext) -> None: # 
                      f"<blockquote>{messagesData[appellant_id][message_N]}</blockquote>\n"
                      f"<i>Сообщение №{appellant_message_count}</i>\n\n"
                      f"Принят {appealData[appellant_id].admin_user}.",
-                    reply_markup=unbanKeyboardAcceptedActions_(appeal_id)
+                    reply_markup=await unbanKeyboardAcceptedActions_(appeal_id)
             )
 
             await bot.set_message_reaction(
@@ -143,9 +143,9 @@ async def unbanAppellantMessage(message: Message, state: FSMContext) -> None: # 
                 reaction=[{"type": "emoji", "emoji": "👍"}]
             )
 
-# Админ отправил сообщение.
 @rt.message(F.chat.id == ID_OERCHAT_ADMIN, F.message_thread_id == ID_OERCHAT_ADMIN_BOT_THREAD, F.reply_to_message != None, F.text)
 async def unbanAdminMessage(message: Message, state: FSMContext) -> None:
+    '''Админ отправил сообщение.'''
     global appealData
     appellant_id = None
     replied_id = message.reply_to_message.message_id
@@ -176,9 +176,9 @@ async def unbanAdminMessage(message: Message, state: FSMContext) -> None:
         await unbanWriteAppealIdInDB(appellant_id, state)
 
 
-# Люто очистить всю память appealData и messagesData .
-@rt.message(F.chat.id == ID_OERCHAT_ADMIN, F.from_user.id.in_(SUPERADMIN), F.text.lower() == f"{PREFIX}очистить апелляции")
+@rt.message(F.chat.id == ID_OERCHAT_ADMIN, F.from_user.id.in_(SUPERADMINS), F.text.lower() == f"{PREFIX}очистить апелляции")
 async def unbanClearData(message: Message) -> None:
+    '''Люто очистить всю память appealData и messagesData .'''
     if message.message_thread_id != ID_OERCHAT_ADMIN_BOT_THREAD:
         await message.reply("Эту команду можно вводить только в топике с <a href='https://t.me/c/2062958469/65368'>жалобами</a>.")
         return
@@ -193,7 +193,7 @@ async def unbanClearData(message: Message) -> None:
 
 @rt.callback_query(F.data == "unbanClearDataConfirm")
 async def unbanClearDataConfirm(callback: CallbackQuery) -> None:
-    if callback.from_user.id != SUPERADMIN:
+    if callback.from_user.id != SUPERADMINS:
         await callback.answer("🖕 Ты не суперадмин")
         return
 
@@ -208,7 +208,7 @@ async def unbanClearDataConfirm(callback: CallbackQuery) -> None:
     
 @rt.callback_query(F.data == "unbanClearDataCancel")
 async def unbanClearDataCancel(callback: CallbackQuery) -> None:
-    if callback.from_user.id != SUPERADMIN:
+    if callback.from_user.id != SUPERADMINS:
         await callback.answer("🖕 Ты не суперадмин")
         return
 

@@ -20,12 +20,12 @@ cmdPlayers_cmdHelp_notice = "Не знаете как пользоваться �
 
 
 
-'''Взаимодействие с БД ЦРМ таблица players.db'''
+# Взаимодействие с БД ЦРМ таблица players.db
 @rt.message(F.chat.id == ID_CRM_OE_ADMIN, Command("players"))
 async def cmdPlayers(message: Message, command: CommandObject) -> None:
     '''
     CRUD-взаимодействие с людьми в таблице при помощи аргументов.
-    Узнать подробнее можно в master/handlers: cmdHelp(): if message.chat.id == ID_CRM_OE_ADMIN: if args[0] == "user".
+    Узнать подробнееЮ, как взаимодействовать с командой, можно в master/handlers: cmdHelp(): if message.chat.id == ID_CRM_OE_ADMIN: if args[0] == "user" .
     '''
     if message.message_thread_id != ID_CRM_OE_ADMIN_BOT_THREAD:
         cleared_chat_id = str(message.chat.id).replace("-100", "")
@@ -235,12 +235,13 @@ async def fcmdEditPoints(message: Message) -> None:
         await logOther(f"(i) crm/admin/handlers.py: editPoints(): {message.from_user.id} -влияние {target_id}")
 
 
-@rt.message(F.chat.id == ID_CRM_OE_ADMIN, F.text == f"{PREFIX}список стран")
+@rt.message(F.chat.id == ID_CRM_OE_ADMIN, F.text == f"{PREFIX}страны список")
 async def fcmdCountriesList(message: Message) -> None:
     '''
     Автоматическое составление списка игркоков и выкладывание в соответствующий топик ЦРМ.
     Пока что без вывода стран, у которых нет игроков.
     '''
+    args = message.text.split(" ")
     message = await message.reply("⏱️ <i>Загрузка.</i>")
 
     users_data = await readUsers()

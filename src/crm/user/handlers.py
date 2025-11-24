@@ -59,7 +59,7 @@ async def uniWho(message: Message, command: CommandObject) -> None:
         await message.reply("👻 <b>Это не игрок!</b>")
 
 
-'''Система репутации'''
+# Система репутации
 @dataclass
 class ReputationDataclass:
     user_id: int
@@ -71,7 +71,8 @@ reputationData = {}
 @rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == "+реп")
 @rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == "-rep")
 @rt.message(F.chat.id == ID_CRM_OE, F.text.lower() == "-реп")
-async def textReputation(message: Message) -> None:
+async def fcmdReputation(message: Message) -> None:
+    '''Управление репутацией человека. Плюс и минус реп.'''
     global reputationData
     user_id = message.from_user.id
     current_time = datetime.now().timestamp()
@@ -121,9 +122,9 @@ async def textReputation(message: Message) -> None:
     )
 
 
-'''Удаление оффтопа'''
 @rt.message(F.chat.id == ID_CRM_OE, F.message_thread_id.in_(ID_CRM_OE_NONOFFTOP_THREADS))
 async def clearOfftop(message: Message) -> None:
+    '''Удаление оффтопа.'''
     user_user = f"@{message.from_user.username}" if message.from_user.username else f"{message.from_user.first_name} ({message.from_user.id})"
 
     if message.text and (message.text.startswith("//") or message.text.startswith("((")):
