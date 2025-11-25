@@ -14,14 +14,12 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 
 
-'''
-В этом фале храняться глобальные переменные, функции, датаклассы и так далее,
-неоходимые для работы некоторых команд, раскинутых на несколько файлов.
-'''
+# В этом фале храняться глобальные переменные, функции, датаклассы и так далее,
+# неоходимые для работы некоторых команд, раскинутых на несколько файлов.
 
 
 
-'''/unban'''
+# /unban
 # appellant — подающий апелляцию, admin — принимающий.
 appealData = {}   # Хранит в себе данные об апелляции (см. AppealDataclass).
 messagesData = {} # Хранит в себе данные о сообщениях, написаные апеллянтом.
@@ -45,8 +43,9 @@ class AppealDataclass:
 
 async def unbanAppealStatusCheck(appellant_id: int) -> bool:
     '''
-    Проверка статуса апелляции.
-    Возвращает True если открыта и False если закрыта (и заодно очищает память если апелляция вообще не существует, но есть в памяти).
+    */unban (`unbanUni()`):*
+    **Проверка статуса апелляции.**
+    Возвращает `True` если открыта и `False` если закрыта *(и заодно очищает память если апелляции вообще не существует, но на есть в памяти)*.
     '''
     global appealData
     global messagesData
@@ -64,7 +63,7 @@ async def unbanAppealStatusCheck(appellant_id: int) -> bool:
     return True
 
 async def unbanWriteAppealIdInDB(appellant_id: int, state: FSMContext) -> None: # 
-    ''' Запись ID апелляции в БД. '''
+    '''*/unban (unbanUni()):* Запись ID апелляции в БД.'''
     global appealData
     appellant_data = await readUser(appellant_id)
     appeal_id = appealData[appellant_id].appeal_id
@@ -82,7 +81,7 @@ async def unbanWriteAppealIdInDB(appellant_id: int, state: FSMContext) -> None: 
     await unbanAppealStatusCheck(appellant_id)
 
 async def unbanNoMessageTimeout(appellant_id: int, state: FSMContext) -> None:
-    '''Если в течение 24 часов апелляция не была решена, то она закрывается.'''
+    '''*/unban (unbanUni()):* Если в течение 24 часов апелляция не была решена, то она закрывается.'''
     global appealData
     global messagesData
 

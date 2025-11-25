@@ -5,6 +5,7 @@ from config import (
 )
 from master.handlers import rt as mHandlersRouter
 
+from oer.user.handlers import rt as oerUserHandlersRouter
 from oer.admin.handlers import rt as oerAdminHandlersRouter
 from oer.admin.callbacks import rt as oerAdminCallbacksRouter
 from oer.database.scheme import createTableAppeals
@@ -31,7 +32,6 @@ async def edit_start_message_text(message_id: int, text: str):
         text=text
     )
 
-
 async def main() -> None:
     '''Функция запуска бота.'''
     session = ClientSession()
@@ -54,6 +54,8 @@ async def main() -> None:
             dp.include_router(oerAdminHandlersRouter)
             dp.include_router(oerAdminCallbacksRouter)
             await logOther("(i) Запуск бота: oer: admin подключен.")
+            dp.include_router(oerUserHandlersRouter)
+            await logOther("(i) Запуск бота: oer: user подключен.")
             await createTableAppeals()
             create_task(schedulerAppealsTimeout())
             await logOther("(i) Запуск бота: oer: БД подключена.")

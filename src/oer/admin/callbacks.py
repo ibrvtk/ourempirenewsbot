@@ -28,7 +28,7 @@ rt = Router()
 # /unban
 @rt.callback_query(F.data.startswith("unbanAppealAccept_"))
 async def unbanCbAppealAccept(callback: CallbackQuery, state: FSMContext) -> None:
-    '''Апелляция принята.'''
+    '''/unban (unbanUni()): Апелляция принята.'''
     global appealData
     global messagesData
     appellant_id = int(callback.data.split("_")[1])
@@ -78,7 +78,7 @@ async def unbanCbAppealAccept(callback: CallbackQuery, state: FSMContext) -> Non
 
 @rt.callback_query(F.data.startswith("unbanAppealDecline_"))
 async def unbanCbAppealDecline(callback: CallbackQuery, state: FSMContext) -> None:
-    '''Апелляция отклонена.'''
+    '''/unban (unbanUni()): Апелляция отклонена.'''
     global appealData
     global messagesData
     appellant_id = int(callback.data.split("_")[1])
@@ -131,7 +131,7 @@ async def unbanCbAppealDecline(callback: CallbackQuery, state: FSMContext) -> No
 
 @rt.callback_query(F.data.startswith("unbanAppealTimeout_"))
 async def unbanCbAppealTimeout(callback: CallbackQuery, state: FSMContext) -> None:
-    '''Выдан таймаут.'''
+    '''/unban (unbanUni()): Выдан таймаут.'''
     global appealData
     global messagesData
     appellant_id = int(callback.data.split("_")[1])
@@ -227,7 +227,7 @@ async def unbanTimeoutSetTime(message: Message, state: FSMContext) -> None:
 
 @rt.callback_query(F.data.startswith("unbanAppealAcceptUnban_"))
 async def unbanCbUnbanAccept(callback: CallbackQuery, state: FSMContext) -> None:    
-    '''В разбане разрешено.'''
+    '''/unban (unbanUni()): В разбане разрешено.'''
     global appealData
     appellant_id = int(callback.data.split("_")[1])
 
@@ -271,7 +271,7 @@ async def unbanCbUnbanAccept(callback: CallbackQuery, state: FSMContext) -> None
             text=f"Если во время попытки зайти в какой-либо чат <a href='https://blog.ourempire.ru/chats'>сетки</a> Вам пишет что Вы забанены — это техническая ошибка. Напишите в ЛС @{DEVELOPER}."
         )
 
-        await logOther(f"(i) oer/admin/callbacks.py: unbanTimeoutSetTime(): {admin_id} разбанил {appellant_id}.")
+        await logOther(f"(i) oer/admin/callbacks.py: unbanCbUnbanAccept(): {admin_id} разбанил {appellant_id}.")
     
     except Exception as e:
         if "chat not found" in str(e):
@@ -286,7 +286,7 @@ async def unbanCbUnbanAccept(callback: CallbackQuery, state: FSMContext) -> None
 
 @rt.callback_query(F.data.startswith("unbanAppealDeclineUnban_"))
 async def unbanCbUnbanDecline(callback: CallbackQuery, state: FSMContext) -> None:
-    '''В разбане отказано.'''
+    '''/unban (unbanUni()): В разбане отказано.'''
     global appealData
     appellant_id = int(callback.data.split("_")[1])
 
@@ -326,7 +326,7 @@ async def unbanCbUnbanDecline(callback: CallbackQuery, state: FSMContext) -> Non
             text="❌ <b>Вам отказали в разбане.</b>"
         )
 
-        await logOther(f"(i) oer/admin/callbacks.py: unbanTimeoutSetTime(): {admin_id} не разбанил {appellant_id}.")
+        await logOther(f"(i) oer/admin/callbacks.py: unbanCbUnbanDecline(): {admin_id} не разбанил {appellant_id}.")
     
     except Exception as e:
         if "chat not found" in str(e):
@@ -342,7 +342,7 @@ async def unbanCbUnbanDecline(callback: CallbackQuery, state: FSMContext) -> Non
 
 @rt.callback_query(F.data.startswith("unbanAppealMsgHistoryPrev_"))
 async def unbanCbAppealMessageHistoryPrev(callback: CallbackQuery) -> None:
-    '''Предыдущее сообщение апеллянта в дискуссии.'''
+    '''/unban (unbanUni()): Предыдущее сообщение апеллянта в дискуссии.'''
     global appealData
     appellant_id = int(callback.data.split("_")[1])
 
@@ -388,7 +388,7 @@ async def unbanCbAppealMessageHistoryPrev(callback: CallbackQuery) -> None:
 
 @rt.callback_query(F.data.startswith("unbanAppealMsgHistoryNext_"))
 async def unbanCbAppealMessageHistoryNext(callback: CallbackQuery) -> None:
-    '''Следующее сообщение апеллянта в дискуссии.'''
+    '''/unban (unbanUni()): Следующее сообщение апеллянта в дискуссии.'''
     global appealData
     appellant_id = int(callback.data.split("_")[1])
 

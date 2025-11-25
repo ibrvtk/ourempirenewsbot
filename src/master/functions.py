@@ -11,8 +11,10 @@ from aiogram.types import Message
 
 async def getUser(user_id: int, return_full: bool = True):
     '''
-    Принимаем TG-ID, возвращаем информацию.
-    Если return_full = False, то вернёт только переменную user_user.
+    **Принимаем TG-ID, возвращаем всю информацию о человеке, если у него есть переписка с ботом.**
+    Если `return_full = False`, то вернёт только переменную `user_user`.
+    В случае если переписки с ботом нет, то возвращаем `None`, но если `return_full = False`, то возвращаем `"<code>user_id</code>"`.
+    (`user_user` — стандартизированный способ обращения к человеку, в виде `@username`, иначе `first_name (<code>id</code)`)
     '''
     try:
         user = await bot.get_chat(user_id)
@@ -27,16 +29,18 @@ async def getUser(user_id: int, return_full: bool = True):
         return user_user
 
 
-async def answerRawError(message: Message, e: Exception, e_fastcode: str = "", tgTerminal: bool = False) -> None:
+async def answerRawError(message: Message, e: Exception, e_fastcode: str = "", show_error: bool = True) -> None:
     '''
-    Универсальный обработчик ошибок.
-    e_factcode — краткое содержание ошибки, по которому её можно быстро идентефицировать.
-    tgTerminal — не выводить ошибку пользователю? Обычно использую если ошибка может вывестись, хотя вызывалась не команда (например в crm/admin/handlers.py: clearMessageFromNotPlayer()).
+    **Универсальный обработчик ошибок.**
+    `message` — сообщение, вызвавшее ошибку.
+    `e` — сырой вид ошибки.
+    `e_factcode` — краткое содержание ошибки, по которому её можно быстро идентефицировать.
+    `show_error` — вывести ошибку пользователю?
     '''
     # from aiogram.exceptions import TelegramBadRequest
     error = str(e)
     
-    if not tgTerminal:
+    if show_error:
         if "message can't be deleted" in error:
             await message.reply(f"❌ <b>Ошибка.</b> Сообщение не может быть удалено. У бота достаточно прав?")
         elif "database is locked" in error:
@@ -73,12 +77,12 @@ async def answerRawError(message: Message, e: Exception, e_fastcode: str = "", t
     )
 
 
-async def delayMessageDelete(message: Message, delay: int, isOfftop: bool = False) -> None: # Отложенное удаление сообщения.
+async def delayMessageDelete(message: Message, delay: int, is_offtop: bool = False) -> None:
     '''
-    Отложенное удаление сообщения.
-    message — сообщение, которое нужно удалить.
-    delay — задержка, с которой нужно удалить message.
-    isOfftop — является ли message оффтопом (нужно лишь для уточнения в терминале).
+    **Отложенное удаление сообщения.**
+    `message` — сообщение, которое нужно удалить.
+    `delay` — задержка, с которой нужно удалить `message`.
+    `is_offtop` — является ли `message` оффтопом (нужно лишь для уточнения логгирования в терминале).
     '''
     from asyncio import sleep
     await sleep(delay)
@@ -96,7 +100,7 @@ async def delayMessageDelete(message: Message, delay: int, isOfftop: bool = Fals
     try:
         await message.delete()
 
-        if not isOfftop:
+        if not is_offtop:
             placeholderText += "Удалено сообщение по отложке"
         else:
             placeholderText += "Удалён оффтоп"

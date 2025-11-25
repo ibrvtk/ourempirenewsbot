@@ -5,6 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 # /unban
 async def unbanKeyboard_(appeal_id: str):
+    '''/unban (unbanUni()): Клавиатура управления поданной апелляцией.'''
     keyboard = InlineKeyboardBuilder()
     
     keyboard.add(InlineKeyboardButton(text="✅ Принять", callback_data=f"unbanAppealAccept_{appeal_id}"))
@@ -14,6 +15,7 @@ async def unbanKeyboard_(appeal_id: str):
     return keyboard.adjust(3).as_markup()
 
 async def unbanKeyboardAcceptedActions_(appeal_id: str):
+    '''/unban (unbanUni()): Клавиатура управления принятой апелляцией.'''
     keyboard = InlineKeyboardBuilder()
     
     keyboard.add(InlineKeyboardButton(text="✅ Разбан", callback_data=f"unbanAppealAcceptUnban_{appeal_id}"))

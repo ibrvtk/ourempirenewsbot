@@ -6,14 +6,14 @@ from datetime import datetime
 
 
 
-async def logError(message, top: bool = False) -> None:
+async def logError(message, forced: bool = False) -> None:
     '''
-    Логгирование ошибки.
-    message — сообщение ошибки.
-    top — логгировать принудительно?.
+    **Логгирование ошибки.**
+    `message` — сообщение, которое будет выведено в терминал.
+    `forced` — логгировать принудительно?
     '''
     if not logErrorsBool:
-        if not top:
+        if not forced:
             return
     
     timestamp = datetime.now().strftime("%H:%M")
@@ -21,8 +21,8 @@ async def logError(message, top: bool = False) -> None:
 
 async def logOther(message):
     '''
-    Логгирование любой информации.
-    message — сообщение, которое будет выведено в терминал.
+    **Логгирование любой информации.**
+    `message` — сообщение, которое будет выведено в терминал.
     '''
     if not logOthersBool:
         return
