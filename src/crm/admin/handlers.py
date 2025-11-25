@@ -236,12 +236,11 @@ async def fcmdEditPoints(message: Message) -> None:
 
 
 @rt.message(F.chat.id == ID_CRM_OE_ADMIN, F.text == f"{PREFIX}страны список")
-async def fcmdCountriesList(message: Message) -> None:
+async def fcmdMakeCountriesList(message: Message) -> None:
     '''
     Автоматическое составление списка игркоков и выкладывание в соответствующий топик ЦРМ.
     Пока что без вывода стран, у которых нет игроков.
     '''
-    args = message.text.split(" ")
     message = await message.reply("⏱️ <i>Загрузка.</i>")
 
     users_data = await readUsers()
@@ -275,29 +274,24 @@ async def fcmdCountriesList(message: Message) -> None:
 async def clearMessageFromNotPlayer(message: Message) -> None:
     '''Удаление сообщений от не игроков в топиках [И] (для игроков).'''
     try:
-        user_data = await readUser(message.from_user.id)
-        if user_data[3] == "None" and user_data[1] == 0:
+        users_data = await readUsers()
+        player_ids = [user[0] for user in users_data]
+        
+        if message.from_user.id not in player_ids:
             await message.delete()
             return
-
-        # users_data = await readUsers()
-        # player_ids = [user[0] for user in users_data]
         
-        # if message.from_user.id not in player_ids:
-        #     await message.delete()
-        #     return
-        
-        # for user_id, countryName, countryFlag, countryStatus, adminLevel in users_data:
-        #     if user_id == message.from_user.id and countryName == "None" and adminLevel == 0:
-        #         await message.delete()
-        #         await logOther(f"(V) crm/admin/handlers.py: clearMessageFromNotPlayer(): Успех — Удалено сообщение от не игрока.")
-        #         break
+        for user_id, countryName, countryFlag, countryStatus, adminLevel in users_data:
+            if user_id == message.from_user.id and countryName == "None" and adminLevel == 0:
+                await message.delete()
+                await logOther(f"(V) crm/admin/handlers.py: clearMessageFromNotPlayer(): Успех — Удалено сообщение от не игрока.")
+                break
     
     except Exception as e:
         if "message can't be deleted" in str(e):
             e_fastcode = "message can't be deleted"
-            await answerRawError(message, e, e_fastcode, True)
+            await answerRawError(message, e, e_fastcode, False)
             await logError(f"crm/admin/handlers.py: clearMessageFromNotPlayer(): Сообщение не может быть удалено. У бота достаточно прав?")
         else:
-            await answerRawError(message=message, e=e, tgTerminal=True)
+            await answerRawError(message=message, e=e, show_error=False)
             await logError(f"crm/admin/handlers.py: clearMessageFromNotPlayer(): {e}.")

@@ -16,7 +16,7 @@
 ## О проекте
 
 * [Python 3.12.3](https://www.python.org/downloads/release/python-3123), [aiogram 3.22.0](https://t.me/aiogram_live/125).
-* W.I.P. 0.4.4.4
+* W.I.P. 0.4.4.4.1
 * Гитхаб репозиторий "перекочевал" из `vkuskiy/oerChatBot` _(Нишка)_ _(ныне удалено)_ на `ibrvtk/ourempirenewsbot`.
 * `Type checking` должен быть `off`, что бы избежать "критические" ошибки «Отсутствует проверка на None».
 * Типы уведомлений в терминале:
